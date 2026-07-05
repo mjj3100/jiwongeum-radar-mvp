@@ -54,12 +54,12 @@ export function ResultsView({
   return (
     <div className="mx-auto max-w-2xl space-y-10">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">맞춤 지원사업 진단 결과</h1>
+        <h1 className="text-xl font-bold text-navy-900">맞춤 지원사업 진단 결과</h1>
         {canRerun && (
           <button
             onClick={handleRerun}
             disabled={pending}
-            className="rounded-md border border-neutral-300 px-3 py-1.5 text-xs font-semibold hover:bg-neutral-50 disabled:opacity-50"
+            className="rounded-md border border-teal-dark/40 px-3 py-1.5 text-xs font-semibold text-teal-dark hover:bg-teal-tint disabled:opacity-50"
           >
             {pending ? '다시 분석 중...' : '다시 진단받기'}
           </button>

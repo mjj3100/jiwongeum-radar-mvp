@@ -1,32 +1,61 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --navy-950: #060d24;
+  --navy-900: #0a1330;
+  --navy-800: #0f1b3c;
+  --navy-700: #1a2650;
+  --slate: #8892b0;
+  --lavender: #b8c0d6;
+  --teal: #00d4aa;
+  --teal-dark: #00a884;
+  --teal-tint: #e6faf5;
+  --warm-tint: #fdf6e3;
+  --warm-border: #d4af37;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-pretendard);
+  --color-navy-950: var(--navy-950);
+  --color-navy-900: var(--navy-900);
+  --color-navy-800: var(--navy-800);
+  --color-navy-700: var(--navy-700);
+  --color-slate: var(--slate);
+  --color-lavender: var(--lavender);
+  --color-teal: var(--teal);
+  --color-teal-dark: var(--teal-dark);
+  --color-teal-tint: var(--teal-tint);
+  --color-warm-tint: var(--warm-tint);
+  --color-warm-border: var(--warm-border);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #ffffff;
+  color: var(--navy-900);
 }
 
 @layer components {
   .input {
-    @apply w-full rounded-md border border-neutral-300 px-3 py-2 text-sm;
+    @apply w-full rounded-md border border-neutral-300 px-3 py-2 text-sm text-navy-900 focus:border-teal focus:outline-none focus:ring-1 focus:ring-teal;
+  }
+
+  .btn-primary {
+    @apply inline-block rounded-md bg-teal px-6 py-3 text-sm font-semibold text-navy-950 transition-colors hover:bg-teal-dark;
+  }
+
+  .btn-outline {
+    @apply inline-block rounded-md border border-navy-900/15 px-6 py-3 text-sm font-semibold text-navy-900 transition-colors hover:bg-navy-900/5;
+  }
+
+  .eyebrow {
+    @apply text-xs font-bold tracking-[0.2em] text-teal-dark uppercase;
+  }
+
+  .callout-teal {
+    @apply rounded-md border-l-4 border-teal bg-teal-tint px-4 py-3 text-sm text-navy-900;
+  }
+
+  .callout-warm {
+    @apply rounded-md border-l-4 border-warm-border bg-warm-tint px-4 py-3 text-sm text-navy-900;
   }
 }

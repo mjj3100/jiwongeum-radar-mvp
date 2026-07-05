@@ -14,7 +14,7 @@ export function BusinessProfileForm() {
   return (
     <form action={formAction} className="mx-auto max-w-lg space-y-5">
       <div>
-        <h1 className="text-xl font-bold">사업 정보를 입력해주세요</h1>
+        <h1 className="text-xl font-bold text-navy-900">사업 정보를 입력해주세요</h1>
         <p className="mt-1 text-sm text-neutral-500">
           최소한의 정보로 맞춤 공고 3~5개와 1순위 공고 미니 진단을 만들어드립니다.
         </p>
@@ -96,11 +96,7 @@ export function BusinessProfileForm() {
 
       {state.error && <p className="text-sm text-red-600">{state.error}</p>}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="w-full rounded-md bg-neutral-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-neutral-700 disabled:opacity-50"
-      >
+      <button type="submit" disabled={pending} className="btn-primary w-full disabled:opacity-50">
         {pending ? '분석 중... (최대 30초)' : '맞춤 공고 + 미니 진단 받기'}
       </button>
     </form>

@@ -33,7 +33,7 @@ export default async function DashboardPage() {
   if (!isActive) {
     return (
       <main className="mx-auto max-w-lg px-6 py-24 text-center">
-        <h1 className="text-xl font-bold">Starter 구독이 필요합니다</h1>
+        <h1 className="text-xl font-bold text-navy-900">Starter 구독이 필요합니다</h1>
         <p className="mt-2 text-sm text-neutral-600">
           {starter?.expires_at
             ? `구독이 ${new Date(starter.expires_at).toLocaleDateString('ko-KR')}에 만료되었습니다.`
@@ -41,7 +41,7 @@ export default async function DashboardPage() {
         </p>
         <a
           href={LITTLY_URL_STARTER}
-          className="mt-6 inline-block rounded-md bg-neutral-900 px-4 py-2 text-sm font-semibold text-white"
+          className="mt-6 inline-block btn-primary"
         >
           Starter 구독(재)시작하기
         </a>
@@ -62,7 +62,7 @@ export default async function DashboardPage() {
     return (
       <main className="mx-auto max-w-lg px-6 py-24 text-center">
         <p className="text-sm text-neutral-600">사업 정보를 먼저 입력해야 맞춤 공고를 볼 수 있어요.</p>
-        <Link href="/result" className="mt-4 inline-block rounded-md bg-neutral-900 px-4 py-2 text-sm font-semibold text-white">
+        <Link href="/result" className="mt-4 inline-block btn-primary">
           사업 정보 입력하러 가기
         </Link>
       </main>
