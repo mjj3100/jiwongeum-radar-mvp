@@ -79,7 +79,23 @@ export function ResultsView({
       <section>
         <h2 className="text-base font-bold text-neutral-500">맞춤 공고 후보</h2>
         {matches.length === 0 && (
-          <p className="mt-2 text-base text-neutral-500">현재 조건에 맞는 공고를 찾지 못했습니다. 사업 정보를 다시 확인해보세요.</p>
+          <div className="mt-4 rounded-xl border border-neutral-200 bg-neutral-50 p-6">
+            <p className="text-lg font-bold text-navy-900">지금은 뚜렷하게 맞는 공고를 찾지 못했어요</p>
+            <p className="mt-2 text-base text-neutral-600">
+              오류가 아니라, 현재 등록된 공고 중에는 입력하신 조건과 강하게 맞는 게 없었다는 뜻이에요.
+              공고 데이터는 매일 새벽 자동으로 업데이트되니, 며칠 뒤 다시 확인하면 새 공고가 잡힐 수 있어요.
+            </p>
+            <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-neutral-500">
+              <li>업종·사업 아이템 설명을 조금 더 구체적으로 적어보세요</li>
+              <li>지역/사업자 상태를 다시 한번 확인해보세요</li>
+            </ul>
+            <Link
+              href="/result?edit=1"
+              className="btn-outline mt-4 inline-block text-sm"
+            >
+              정보 수정하고 다시 검색하기
+            </Link>
+          </div>
         )}
         <ul className="mt-4 space-y-4">
           {matches.map((m) => (

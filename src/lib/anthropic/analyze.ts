@@ -28,7 +28,7 @@ const diagnosisSchema = z.object({
 })
 
 const responseSchema = z.object({
-  matches: z.array(matchSchema).min(1).max(5),
+  matches: z.array(matchSchema).max(5),
   diagnosis: diagnosisSchema.nullable(),
 })
 
