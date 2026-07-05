@@ -35,7 +35,7 @@
 ## Phase 4 — DB 스키마 ✅ 거의 완료
 - [x] 마이그레이션 0001, 0002 작성 및 Supabase 실행 완료
 - [x] claim_order v2 실전 테스트 통과 (1회용 검증, bundle/starter 분기, 구독 연장 계산)
-- [ ] **마이그레이션 0003 실행 필요** — `grant_listings (source, external_id)` 유니크 제약. API 동기화(upsert)가 이거 없이는 저장 안 됨 (SQL Editor에서 0001/0002와 같은 방식으로 실행)
+- [x] 마이그레이션 0003 실행 완료 → 0004로 수정(부분 인덱스가 PostgREST onConflict와 안 맞아 일반 유니크 제약으로 교체) → 실행 완료
 
 ## Phase 5 — 결제 연동 ✅ 거의 완료
 - [x] `/signup` 주문번호 검증 + claim_order 연결 (실제 가입 테스트 통과, 프로덕션에서도 확인)
@@ -46,15 +46,14 @@
 - [ ] 리틀리 starter 상품 등록 + 링크 연결
 - [ ] 운영: 주문번호 수동 등록 절차 확립 (결제 알림 확인 → Supabase Table Editor 입력) — 지금은 Claude Code가 스크립트로 대행 중
 
-## Phase 6 — 공고 API 연동 ✅ 코드 완료 / ⏸ 마이그레이션 0003 대기
+## Phase 6 — 공고 API 연동 ✅ 완료
 - [x] K-Startup API 키 발급 + 실제 호출 검증 (99/100건이 현재 접수중으로 정상 필터링)
 - [x] 기업마당 API 키 발급 + 실제 호출 검증 (RSS/XML 파싱 정상)
 - [x] K-Startup API 클라이언트 (`src/lib/grants/kstartup.ts`) — 현재 접수중(rcrt_prgs_yn=Y)만, 페이지네이션, 지역/날짜 정규화
 - [x] 기업마당 API 클라이언트 (`src/lib/grants/bizinfo.ts`) — fast-xml-parser로 RSS 파싱, 신청기간 문자열 파싱
-- [x] `/api/grants/sync` 라우트 — CRON_SECRET 인증, 배치 upsert, 로컬에서 fetch 정상 확인(K-Startup 218건+기업마당 100건)
+- [x] `/api/grants/sync` 라우트 — CRON_SECRET 인증, 배치 upsert
 - [x] Vercel Cron 설정 (매일 03:00 UTC 자동 동기화) — `vercel.json`
-- [ ] **마이그레이션 0003 실행 후 실제 upsert 재확인 필요** (지금은 유니크 제약 없어서 저장 단계에서 에러)
-- [ ] 마이그레이션 0003 실행 후, 배포 환경에서 `/api/grants/sync` 1회 수동 트리거해서 실제 DB 반영 확인
+- [x] **프로덕션 실제 DB 반영 확인 완료** — `{"ok":true,"fetched":{"kstartup":218,"bizinfo":100},"upserted":318}` 실제 지원사업 318건 저장됨
 
 ## Phase 7 — 보안·QA ✅ 완료
 - [x] 인증 게이트 확인 (미인증/미승인 리다이렉트)
