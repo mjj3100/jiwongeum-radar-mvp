@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import Link from 'next/link'
 import { rerunAnalysis } from './actions'
 import type { RiskSentence, Verdict } from '@/lib/types'
 
@@ -55,15 +56,23 @@ export function ResultsView({
     <div className="mx-auto max-w-2xl space-y-10">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-extrabold text-navy-900">맞춤 지원사업 진단 결과</h1>
-        {canRerun && (
-          <button
-            onClick={handleRerun}
-            disabled={pending}
-            className="rounded-md border border-teal-dark/40 px-4 py-2 text-sm font-semibold text-teal-dark hover:bg-teal-tint disabled:opacity-50"
+        <div className="flex items-center gap-2">
+          <Link
+            href="/result?edit=1"
+            className="rounded-md border border-navy-900/15 px-4 py-2 text-sm font-semibold text-navy-900 hover:bg-navy-900/5"
           >
-            {pending ? '다시 분석 중...' : '다시 진단받기'}
-          </button>
-        )}
+            정보 수정하기
+          </Link>
+          {canRerun && (
+            <button
+              onClick={handleRerun}
+              disabled={pending}
+              className="rounded-md border border-teal-dark/40 px-4 py-2 text-sm font-semibold text-teal-dark hover:bg-teal-tint disabled:opacity-50"
+            >
+              {pending ? '다시 분석 중...' : '다시 진단받기'}
+            </button>
+          )}
+        </div>
       </div>
       {error && <p className="text-base text-red-600">{error}</p>}
 

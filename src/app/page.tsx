@@ -35,12 +35,20 @@ export default function LandingPage() {
       {/* HERO — 다크 네이비 + 레이더 글로우 */}
       <section className="relative overflow-hidden bg-navy-950">
         <RadarGlow className="absolute -right-40 -top-32 h-[620px] w-[620px] opacity-90 sm:-right-20" />
-        <div className="relative mx-auto max-w-4xl px-6 py-24 text-center sm:py-32">
-          <div className="flex items-center justify-center gap-2.5">
-            <RadarLogo size={44} />
-            <span className="text-xl font-bold text-white">지원금 레이더</span>
+        <nav className="relative mx-auto flex max-w-4xl items-center justify-between px-6 pt-8">
+          <div className="flex items-center gap-2">
+            <RadarLogo size={28} />
+            <span className="text-base font-bold text-white">지원금 레이더</span>
           </div>
-          <p className="eyebrow mt-8 text-base text-teal">AI 지원사업 신청 준비 OS</p>
+          <Link
+            href="/login"
+            className="rounded-md border border-white/20 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+          >
+            로그인
+          </Link>
+        </nav>
+        <div className="relative mx-auto max-w-4xl px-6 pb-24 pt-12 text-center sm:pb-32">
+          <p className="eyebrow text-base text-teal">AI 지원사업 신청 준비 OS</p>
           <h1 className="mt-5 text-5xl font-extrabold leading-[1.15] tracking-tight text-white sm:text-6xl md:text-7xl">
             지원사업, <span className="text-teal">찾는 것</span>에서
             <br />

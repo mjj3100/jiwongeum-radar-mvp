@@ -2,26 +2,31 @@
 
 import { useActionState } from 'react'
 import { submitBusinessProfile } from './actions'
+import type { BusinessProfileInput } from '@/lib/types'
 
 const initialState = { error: '' }
 
-export function BusinessProfileForm() {
+export function BusinessProfileForm({ defaultValues }: { defaultValues?: BusinessProfileInput }) {
   const [state, formAction, pending] = useActionState(async (_: typeof initialState, formData: FormData) => {
     const result = await submitBusinessProfile(formData)
     return result ?? initialState
   }, initialState)
 
+  const isEdit = Boolean(defaultValues)
+
   return (
     <form action={formAction} className="mx-auto max-w-lg space-y-5">
       <div>
-        <h1 className="text-2xl font-extrabold text-navy-900">사업 정보를 입력해주세요</h1>
+        <h1 className="text-2xl font-extrabold text-navy-900">
+          {isEdit ? '사업 정보를 수정해주세요' : '사업 정보를 입력해주세요'}
+        </h1>
         <p className="mt-2 text-base text-neutral-500">
           최소한의 정보로 맞춤 공고 3~5개와 1순위 공고 미니 진단을 만들어드립니다.
         </p>
       </div>
 
       <Field label="사업자 상태">
-        <select name="founder_status" required className="input">
+        <select name="founder_status" required defaultValue={defaultValues?.founder_status ?? ''} className="input">
           <option value="">선택</option>
           <option value="예비창업자">예비창업자</option>
           <option value="개인사업자">개인사업자</option>
@@ -31,19 +36,19 @@ export function BusinessProfileForm() {
       </Field>
 
       <Field label="사업장 소재지 (예: 서울 마포구)">
-        <input name="region" required placeholder="서울 마포구" className="input" />
+        <input name="region" required placeholder="서울 마포구" defaultValue={defaultValues?.region} className="input" />
       </Field>
 
       <Field label="업종 (예: 카페, 온라인몰, SaaS)">
-        <input name="industry" required placeholder="카페" className="input" />
+        <input name="industry" required placeholder="카페" defaultValue={defaultValues?.industry} className="input" />
       </Field>
 
       <Field label="창업일 (예비창업자는 비워두세요)">
-        <input name="founded_date" type="date" className="input" />
+        <input name="founded_date" type="date" defaultValue={defaultValues?.founded_date ?? ''} className="input" />
       </Field>
 
       <Field label="연매출 구간">
-        <select name="revenue_band" required className="input">
+        <select name="revenue_band" required defaultValue={defaultValues?.revenue_band ?? ''} className="input">
           <option value="">선택</option>
           <option value="없음">없음</option>
           <option value="5천만미만">5천만 미만</option>
@@ -54,7 +59,7 @@ export function BusinessProfileForm() {
       </Field>
 
       <Field label="직원 수">
-        <select name="employee_count" required className="input">
+        <select name="employee_count" required defaultValue={defaultValues?.employee_count ?? ''} className="input">
           <option value="">선택</option>
           <option value="1인">1인</option>
           <option value="2~4명">2~4명</option>
@@ -68,12 +73,13 @@ export function BusinessProfileForm() {
           required
           rows={2}
           placeholder="예: 네이버플레이스·배달앱 리뷰를 분석해 반복 불만과 홍보 소재를 찾아주는 리포트 서비스"
+          defaultValue={defaultValues?.item_description}
           className="input"
         />
       </Field>
 
       <Field label="필요한 지원">
-        <select name="support_needed" required className="input">
+        <select name="support_needed" required defaultValue={defaultValues?.support_needed ?? ''} className="input">
           <option value="">선택</option>
           <option value="사업화자금">사업화자금</option>
           <option value="개발비">개발비</option>
@@ -85,7 +91,7 @@ export function BusinessProfileForm() {
       </Field>
 
       <Field label="준비 상태">
-        <select name="readiness" required className="input">
+        <select name="readiness" required defaultValue={defaultValues?.readiness ?? ''} className="input">
           <option value="">선택</option>
           <option value="아이디어">아이디어</option>
           <option value="MVP">MVP</option>
@@ -97,7 +103,7 @@ export function BusinessProfileForm() {
       {state.error && <p className="text-sm text-red-600">{state.error}</p>}
 
       <button type="submit" disabled={pending} className="btn-primary w-full disabled:opacity-50">
-        {pending ? '분석 중... (최대 30초)' : '맞춤 공고 + 미니 진단 받기'}
+        {pending ? '분석 중... (최대 30초)' : isEdit ? '수정하고 다시 진단받기' : '맞춤 공고 + 미니 진단 받기'}
       </button>
     </form>
   )

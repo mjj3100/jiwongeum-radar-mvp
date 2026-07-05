@@ -3,8 +3,14 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { BusinessProfileForm } from './BusinessProfileForm'
 import { ResultsView } from './ResultsView'
+import type { BusinessProfileInput } from '@/lib/types'
 
-export default async function ResultPage() {
+export default async function ResultPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ edit?: string }>
+}) {
+  const { edit } = await searchParams
   const supabase = await createClient()
   const {
     data: { user },
@@ -53,10 +59,10 @@ export default async function ResultPage() {
     .eq('user_id', user.id)
     .maybeSingle()
 
-  if (!businessProfile) {
+  if (!businessProfile || edit === '1') {
     return (
       <main className="px-6 py-16">
-        <BusinessProfileForm />
+        <BusinessProfileForm defaultValues={businessProfile as BusinessProfileInput | undefined} />
       </main>
     )
   }
@@ -75,7 +81,7 @@ export default async function ResultPage() {
       <ResultsView
         matches={matches ?? []}
         diagnosis={diagnoses?.[0] ?? null}
-        canRerun={Boolean(hasBundle || hasActiveStarter)}
+        canRerun={Boolean(hasActiveStarter)}
       />
     </main>
   )
