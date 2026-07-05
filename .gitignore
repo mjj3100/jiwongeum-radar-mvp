@@ -50,3 +50,6 @@ next-env.d.ts
 *.pptx
 지원금_레이더_전자책.pdf
 gstack 바이브 코딩 실전 강의안.pdf
+
+# Claude Code local settings
+.claude/

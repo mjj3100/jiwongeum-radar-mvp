@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/grants/sync",
+      "schedule": "0 3 * * *"
+    }
+  ]
+}
