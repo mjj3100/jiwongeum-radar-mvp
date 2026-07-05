@@ -30,9 +30,11 @@ export async function submitBusinessProfile(
     item_description: String(formData.get('item_description') || '').trim(),
     support_needed: String(formData.get('support_needed') || '') as BusinessProfileInput['support_needed'],
     readiness: String(formData.get('readiness') || '') as BusinessProfileInput['readiness'],
+    age_group: String(formData.get('age_group') || '') as BusinessProfileInput['age_group'],
+    gender: String(formData.get('gender') || '') as BusinessProfileInput['gender'],
   }
 
-  if (!profile.region || !profile.industry || !profile.item_description) {
+  if (!profile.region || !profile.industry || !profile.item_description || !profile.age_group || !profile.gender) {
     return { error: '필수 항목을 모두 입력해주세요.' }
   }
 

@@ -39,6 +39,30 @@ export function BusinessProfileForm({ defaultValues }: { defaultValues?: Busines
         </select>
       </Field>
 
+      <p className="text-xs text-neutral-400">
+        연령대·성별은 청년창업·여성창업·중장년 지원사업 판별에만 활용됩니다.
+      </p>
+      <div className="grid grid-cols-2 gap-4">
+        <Field label="연령대">
+          <select name="age_group" required defaultValue={defaultValues?.age_group ?? ''} className="input">
+            <option value="">선택</option>
+            <option value="20대이하">20대 이하</option>
+            <option value="30대">30대</option>
+            <option value="40대">40대</option>
+            <option value="50대이상">50대 이상</option>
+          </select>
+        </Field>
+
+        <Field label="성별">
+          <select name="gender" required defaultValue={defaultValues?.gender ?? ''} className="input">
+            <option value="">선택</option>
+            <option value="남성">남성</option>
+            <option value="여성">여성</option>
+            <option value="비공개">비공개</option>
+          </select>
+        </Field>
+      </div>
+
       <Field label="사업장 소재지 (예: 서울 마포구)">
         <input name="region" required placeholder="서울 마포구" defaultValue={defaultValues?.region} className="input" />
       </Field>

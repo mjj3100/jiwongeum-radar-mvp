@@ -8,6 +8,10 @@ export type SupportNeeded = '사업화자금' | '개발비' | '광고비' | '장
 
 export type Readiness = '아이디어' | 'MVP' | '매출발생' | '제출직전'
 
+export type AgeGroup = '20대이하' | '30대' | '40대' | '50대이상'
+
+export type Gender = '남성' | '여성' | '비공개'
+
 export interface BusinessProfileInput {
   founder_status: FounderStatus
   region: string
@@ -18,6 +22,8 @@ export interface BusinessProfileInput {
   item_description: string
   support_needed: SupportNeeded
   readiness: Readiness
+  age_group: AgeGroup
+  gender: Gender
 }
 
 export interface GrantListing {

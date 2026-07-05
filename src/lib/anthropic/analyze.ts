@@ -82,6 +82,8 @@ ${FEW_SHOT_EXAMPLE}
 
 사업자 조건:
 - 사업자 상태: ${profile.founder_status}
+- 연령대: ${profile.age_group} (청년창업/중장년 특화 공고 판별에 참고)
+- 성별: ${profile.gender} (여성창업 특화 공고 판별에 참고, 비공개면 판별에 사용하지 말 것)
 - 사업장 지역: ${profile.region}
 - 업종: ${profile.industry}
 - 창업일: ${profile.founded_date ?? '예비창업자(미창업)'}
