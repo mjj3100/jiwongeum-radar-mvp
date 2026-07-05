@@ -16,8 +16,8 @@ export default function SignupPage() {
   return (
     <main className="mx-auto max-w-sm px-6 py-24">
       <BrandHeader />
-      <h1 className="mt-8 text-2xl font-bold text-navy-900">결제 후 가입</h1>
-      <p className="mt-2 text-sm text-neutral-500">
+      <h1 className="mt-8 text-3xl font-extrabold text-navy-900">결제 후 가입</h1>
+      <p className="mt-3 text-base text-neutral-500">
         결제완료 화면 또는 카카오 알림톡에 표시된 주문번호 16자리를 입력하면 즉시 승인됩니다.
       </p>
       <form action={formAction} className="mt-6 space-y-4">
@@ -53,7 +53,7 @@ export default function SignupPage() {
           {pending ? '확인 중...' : '가입하고 바로 시작하기'}
         </button>
       </form>
-      <p className="mt-4 text-sm text-neutral-500">
+      <p className="mt-5 text-base text-neutral-500">
         이미 가입하셨나요? <Link href="/login" className="font-medium text-teal-dark underline">로그인</Link>
       </p>
     </main>

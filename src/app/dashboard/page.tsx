@@ -33,19 +33,19 @@ export default async function DashboardPage() {
   if (!isActive) {
     return (
       <main className="mx-auto max-w-lg px-6 py-24 text-center">
-        <h1 className="text-xl font-bold text-navy-900">Starter 구독이 필요합니다</h1>
-        <p className="mt-2 text-sm text-neutral-600">
+        <h1 className="text-2xl font-extrabold text-navy-900">Starter 구독이 필요합니다</h1>
+        <p className="mt-3 text-base text-neutral-600">
           {starter?.expires_at
             ? `구독이 ${new Date(starter.expires_at).toLocaleDateString('ko-KR')}에 만료되었습니다.`
             : '무제한 맞춤 공고 조회는 Starter 구독자만 이용할 수 있어요.'}
         </p>
         <a
           href={LITTLY_URL_STARTER}
-          className="mt-6 inline-block btn-primary"
+          className="mt-8 inline-block btn-primary"
         >
           Starter 구독(재)시작하기
         </a>
-        <p className="mt-3 text-xs text-neutral-400">
+        <p className="mt-4 text-sm text-neutral-400">
           결제 후 새 주문번호를 <Link href="/signup" className="underline">가입 화면</Link>에서 입력하면 30일 연장됩니다.
         </p>
       </main>

@@ -36,11 +36,11 @@ export default async function ResultPage() {
   if (!hasBundle && !hasActiveStarter) {
     return (
       <main className="mx-auto max-w-lg px-6 py-24 text-center">
-        <h1 className="text-xl font-bold text-navy-900">이용권이 확인되지 않습니다</h1>
-        <p className="mt-2 text-sm text-neutral-600">
+        <h1 className="text-2xl font-extrabold text-navy-900">이용권이 확인되지 않습니다</h1>
+        <p className="mt-3 text-base text-neutral-600">
           결제 후 안내받은 주문번호로 가입하면 바로 이용하실 수 있어요.
         </p>
-        <Link href="/" className="btn-primary mt-6 inline-block">
+        <Link href="/" className="btn-primary mt-8 inline-block">
           결제 안내 보러가기
         </Link>
       </main>

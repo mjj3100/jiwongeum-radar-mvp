@@ -36,26 +36,30 @@ body {
 
 @layer components {
   .input {
-    @apply w-full rounded-md border border-neutral-300 px-3 py-2 text-sm text-navy-900 focus:border-teal focus:outline-none focus:ring-1 focus:ring-teal;
+    @apply w-full rounded-lg border border-neutral-300 px-4 py-3 text-base text-navy-900 focus:border-teal focus:outline-none focus:ring-1 focus:ring-teal;
   }
 
   .btn-primary {
-    @apply inline-block rounded-md bg-teal px-6 py-3 text-sm font-semibold text-navy-950 transition-colors hover:bg-teal-dark;
+    @apply inline-block rounded-lg bg-teal px-7 py-3.5 text-base font-bold text-navy-950 shadow-sm transition-colors hover:bg-teal-dark;
   }
 
   .btn-outline {
-    @apply inline-block rounded-md border border-navy-900/15 px-6 py-3 text-sm font-semibold text-navy-900 transition-colors hover:bg-navy-900/5;
+    @apply inline-block rounded-lg border-2 border-navy-900/15 px-7 py-3.5 text-base font-bold text-navy-900 transition-colors hover:bg-navy-900/5;
   }
 
   .eyebrow {
-    @apply text-xs font-bold tracking-[0.2em] text-teal-dark uppercase;
+    @apply text-sm font-bold tracking-[0.2em] text-teal-dark uppercase;
   }
 
   .callout-teal {
-    @apply rounded-md border-l-4 border-teal bg-teal-tint px-4 py-3 text-sm text-navy-900;
+    @apply rounded-md border-l-4 border-teal bg-teal-tint px-5 py-4 text-base text-navy-900;
   }
 
   .callout-warm {
-    @apply rounded-md border-l-4 border-warm-border bg-warm-tint px-4 py-3 text-sm text-navy-900;
+    @apply rounded-md border-l-4 border-warm-border bg-warm-tint px-5 py-4 text-base text-navy-900;
+  }
+
+  label {
+    @apply text-base;
   }
 }

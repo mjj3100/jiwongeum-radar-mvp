@@ -14,8 +14,8 @@ export function BusinessProfileForm() {
   return (
     <form action={formAction} className="mx-auto max-w-lg space-y-5">
       <div>
-        <h1 className="text-xl font-bold text-navy-900">사업 정보를 입력해주세요</h1>
-        <p className="mt-1 text-sm text-neutral-500">
+        <h1 className="text-2xl font-extrabold text-navy-900">사업 정보를 입력해주세요</h1>
+        <p className="mt-2 text-base text-neutral-500">
           최소한의 정보로 맞춤 공고 3~5개와 1순위 공고 미니 진단을 만들어드립니다.
         </p>
       </div>
