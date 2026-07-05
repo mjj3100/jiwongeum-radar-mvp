@@ -62,11 +62,11 @@
 - [x] 빌드 통과 확인
 - [x] `/api/grants/sync` 인증 가드 확인 (헤더 없으면 401)
 
-## Phase 8 — 배포 ✅ 거의 완료
-- [x] `.env.local` git 미추적 확인 → GitHub 비공개 저장소 push 완료
-- [x] **Vercel 배포 완료** — https://jiwongeum-radar-mvp.vercel.app (프로덕션 E2E 재검증 완료)
+## Phase 8 — 배포 ✅ 완료
+- [x] `.env.local` git 미추적 확인 → GitHub push 완료
+- [x] **Vercel 배포 완료** — https://jiwongeum-radar-mvp.vercel.app (프로덕션 E2E 재검증 완료, grant sync까지 확인)
 - [x] Vercel 환경변수 등록 완료 (Supabase 3종, Anthropic, 리틀리 2종, K-Startup, 기업마당, CRON_SECRET — 총 9개)
-- [ ] GitHub 저장소 자동연결 실패 (Vercel GitHub App 권한 이슈) — 지금은 CLI로 수동 배포, 나중에 대시보드에서 재시도
+- [x] **GitHub 저장소를 Public으로 전환** — Vercel이 이 계정에서 개인 스코프를 지원하지 않아("personal_scope_not_allowed") 팀 멤버십 문제로 배포가 막혔던 것을 해결. 비밀키는 `.env.local`이라 git에 없어 노출 없음. Pro 업그레이드(유료) 대신 이 방법으로 무료 해결
 - [ ] **키 회전**(service_role, Anthropic) — 로컬 개발 중 사용한 키는 실제 고객 받기 전 재발급 권장
 - [ ] Supabase Site URL = `https://jiwongeum-radar-mvp.vercel.app`
 
