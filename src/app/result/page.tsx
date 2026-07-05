@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { AppShell } from '@/components/AppShell'
 import { BusinessProfileForm } from './BusinessProfileForm'
 import { ResultsView } from './ResultsView'
 import type { BusinessProfileInput } from '@/lib/types'
@@ -19,10 +20,12 @@ export default async function ResultPage({
   // middleware가 미인증을 /login으로 리다이렉트하지만, 방어적으로 한 번 더 확인한다.
   if (!user) {
     return (
-      <main className="mx-auto max-w-lg px-6 py-24 text-center">
-        <p>로그인이 필요합니다.</p>
-        <Link href="/login" className="mt-4 inline-block underline">로그인하러 가기</Link>
-      </main>
+      <AppShell>
+        <div className="mx-auto max-w-lg text-center">
+          <p className="text-base text-neutral-600">로그인이 필요합니다.</p>
+          <Link href="/login" className="btn-primary mt-6 inline-block">로그인하러 가기</Link>
+        </div>
+      </AppShell>
     )
   }
 
@@ -41,15 +44,17 @@ export default async function ResultPage({
 
   if (!hasBundle && !hasActiveStarter) {
     return (
-      <main className="mx-auto max-w-lg px-6 py-24 text-center">
-        <h1 className="text-2xl font-extrabold text-navy-900">이용권이 확인되지 않습니다</h1>
-        <p className="mt-3 text-base text-neutral-600">
-          결제 후 안내받은 주문번호로 가입하면 바로 이용하실 수 있어요.
-        </p>
-        <Link href="/" className="btn-primary mt-8 inline-block">
-          결제 안내 보러가기
-        </Link>
-      </main>
+      <AppShell>
+        <div className="mx-auto max-w-lg text-center">
+          <h1 className="text-2xl font-extrabold text-navy-900">이용권이 확인되지 않습니다</h1>
+          <p className="mt-3 text-base text-neutral-600">
+            결제 후 안내받은 주문번호로 가입하면 바로 이용하실 수 있어요.
+          </p>
+          <Link href="/" className="btn-primary mt-8 inline-block">
+            결제 안내 보러가기
+          </Link>
+        </div>
+      </AppShell>
     )
   }
 
@@ -61,9 +66,9 @@ export default async function ResultPage({
 
   if (!businessProfile || edit === '1') {
     return (
-      <main className="px-6 py-16">
+      <AppShell>
         <BusinessProfileForm defaultValues={businessProfile as BusinessProfileInput | undefined} />
-      </main>
+      </AppShell>
     )
   }
 
@@ -77,12 +82,12 @@ export default async function ResultPage({
   ])
 
   return (
-    <main className="px-6 py-16">
+    <AppShell>
       <ResultsView
         matches={matches ?? []}
         diagnosis={diagnoses?.[0] ?? null}
         canRerun={Boolean(hasActiveStarter)}
       />
-    </main>
+    </AppShell>
   )
 }

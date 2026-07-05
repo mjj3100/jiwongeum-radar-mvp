@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { AppShell } from '@/components/AppShell'
 import { ResultsView } from '@/app/result/ResultsView'
 import { LITTLY_URL_STARTER } from '@/lib/constants'
 
@@ -12,10 +13,12 @@ export default async function DashboardPage() {
 
   if (!user) {
     return (
-      <main className="mx-auto max-w-lg px-6 py-24 text-center">
-        <p>로그인이 필요합니다.</p>
-        <Link href="/login" className="mt-4 inline-block underline">로그인하러 가기</Link>
-      </main>
+      <AppShell>
+        <div className="mx-auto max-w-lg text-center">
+          <p className="text-base text-neutral-600">로그인이 필요합니다.</p>
+          <Link href="/login" className="btn-primary mt-6 inline-block">로그인하러 가기</Link>
+        </div>
+      </AppShell>
     )
   }
 
@@ -32,23 +35,22 @@ export default async function DashboardPage() {
 
   if (!isActive) {
     return (
-      <main className="mx-auto max-w-lg px-6 py-24 text-center">
-        <h1 className="text-2xl font-extrabold text-navy-900">Starter 구독이 필요합니다</h1>
-        <p className="mt-3 text-base text-neutral-600">
-          {starter?.expires_at
-            ? `구독이 ${new Date(starter.expires_at).toLocaleDateString('ko-KR')}에 만료되었습니다.`
-            : '무제한 맞춤 공고 조회는 Starter 구독자만 이용할 수 있어요.'}
-        </p>
-        <a
-          href={LITTLY_URL_STARTER}
-          className="mt-8 inline-block btn-primary"
-        >
-          Starter 구독(재)시작하기
-        </a>
-        <p className="mt-4 text-sm text-neutral-400">
-          결제 후 새 주문번호를 <Link href="/signup" className="underline">가입 화면</Link>에서 입력하면 30일 연장됩니다.
-        </p>
-      </main>
+      <AppShell>
+        <div className="mx-auto max-w-lg text-center">
+          <h1 className="text-2xl font-extrabold text-navy-900">Starter 구독이 필요합니다</h1>
+          <p className="mt-3 text-base text-neutral-600">
+            {starter?.expires_at
+              ? `구독이 ${new Date(starter.expires_at).toLocaleDateString('ko-KR')}에 만료되었습니다.`
+              : '무제한 맞춤 공고 조회는 Starter 구독자만 이용할 수 있어요.'}
+          </p>
+          <a href={LITTLY_URL_STARTER} className="btn-primary mt-8 inline-block">
+            Starter 구독(재)시작하기
+          </a>
+          <p className="mt-4 text-sm text-neutral-400">
+            결제 후 새 주문번호를 <Link href="/signup" className="underline">가입 화면</Link>에서 입력하면 30일 연장됩니다.
+          </p>
+        </div>
+      </AppShell>
     )
   }
 
@@ -60,12 +62,14 @@ export default async function DashboardPage() {
 
   if (!businessProfile) {
     return (
-      <main className="mx-auto max-w-lg px-6 py-24 text-center">
-        <p className="text-sm text-neutral-600">사업 정보를 먼저 입력해야 맞춤 공고를 볼 수 있어요.</p>
-        <Link href="/result" className="mt-4 inline-block btn-primary">
-          사업 정보 입력하러 가기
-        </Link>
-      </main>
+      <AppShell>
+        <div className="mx-auto max-w-lg text-center">
+          <p className="text-base text-neutral-600">사업 정보를 먼저 입력해야 맞춤 공고를 볼 수 있어요.</p>
+          <Link href="/result" className="btn-primary mt-6 inline-block">
+            사업 정보 입력하러 가기
+          </Link>
+        </div>
+      </AppShell>
     )
   }
 
@@ -79,11 +83,11 @@ export default async function DashboardPage() {
   ])
 
   return (
-    <main className="px-6 py-16">
-      <p className="mx-auto mb-6 max-w-2xl text-xs text-neutral-400">
+    <AppShell>
+      <p className="mx-auto mb-6 max-w-2xl text-sm font-semibold text-teal-dark">
         Starter 구독 만료일: {new Date(starter!.expires_at!).toLocaleDateString('ko-KR')}
       </p>
       <ResultsView matches={matches ?? []} diagnosis={diagnoses?.[0] ?? null} canRerun />
-    </main>
+    </AppShell>
   )
 }

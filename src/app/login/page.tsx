@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react'
 import Link from 'next/link'
+import { AuthLayout } from '@/components/AuthLayout'
 import { BrandHeader } from '@/components/BrandHeader'
 import { login } from './actions'
 
@@ -14,30 +15,32 @@ export default function LoginPage() {
   }, initialState)
 
   return (
-    <main className="mx-auto max-w-sm px-6 py-24">
-      <BrandHeader />
-      <h1 className="mt-8 text-3xl font-extrabold text-navy-900">로그인</h1>
-      <form action={formAction} className="mt-6 space-y-4">
+    <AuthLayout>
+      <div className="mb-8 lg:hidden">
+        <BrandHeader />
+      </div>
+      <h1 className="text-3xl font-extrabold text-navy-900">로그인</h1>
+      <form action={formAction} className="mt-8 space-y-5">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-navy-900">이메일</label>
+          <label htmlFor="email" className="block text-sm font-semibold text-navy-900">이메일</label>
           <input
             id="email"
             name="email"
             type="email"
             required
             autoComplete="email"
-            className="input mt-1"
+            className="input mt-1.5"
           />
         </div>
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-navy-900">비밀번호</label>
+          <label htmlFor="password" className="block text-sm font-semibold text-navy-900">비밀번호</label>
           <input
             id="password"
             name="password"
             type="password"
             required
             autoComplete="current-password"
-            className="input mt-1"
+            className="input mt-1.5"
           />
         </div>
         {state.error && <p className="text-sm text-red-600">{state.error}</p>}
@@ -45,12 +48,12 @@ export default function LoginPage() {
           {pending ? '로그인 중...' : '로그인'}
         </button>
       </form>
-      <p className="mt-5 text-base text-neutral-500">
+      <p className="mt-6 text-base text-neutral-500">
         아직 가입 전이신가요?{' '}
-        <Link href="/signup" className="font-medium text-teal-dark underline">
+        <Link href="/signup" className="font-bold text-teal-dark underline">
           결제 후 가입하기
         </Link>
       </p>
-    </main>
+    </AuthLayout>
   )
 }

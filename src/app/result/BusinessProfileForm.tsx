@@ -15,9 +15,13 @@ export function BusinessProfileForm({ defaultValues }: { defaultValues?: Busines
   const isEdit = Boolean(defaultValues)
 
   return (
-    <form action={formAction} className="mx-auto max-w-lg space-y-5">
+    <form
+      action={formAction}
+      className="mx-auto max-w-lg space-y-5 rounded-2xl border border-navy-900/10 bg-white p-8 shadow-[0_12px_40px_rgba(10,19,48,0.06)] sm:p-10"
+    >
       <div>
-        <h1 className="text-2xl font-extrabold text-navy-900">
+        <p className="eyebrow text-teal-dark">{isEdit ? 'EDIT PROFILE' : 'BUSINESS PROFILE'}</p>
+        <h1 className="mt-2 text-3xl font-extrabold text-navy-900">
           {isEdit ? '사업 정보를 수정해주세요' : '사업 정보를 입력해주세요'}
         </h1>
         <p className="mt-2 text-base text-neutral-500">
@@ -112,8 +116,8 @@ export function BusinessProfileForm({ defaultValues }: { defaultValues?: Busines
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="block text-sm font-medium">{label}</span>
-      <div className="mt-1">{children}</div>
+      <span className="block text-sm font-semibold text-navy-900">{label}</span>
+      <div className="mt-1.5">{children}</div>
     </label>
   )
 }

@@ -83,7 +83,7 @@ export function ResultsView({
         )}
         <ul className="mt-4 space-y-4">
           {matches.map((m) => (
-            <li key={m.id} className="rounded-xl border border-neutral-200 p-5">
+            <li key={m.id} className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
               <div className="flex items-start justify-between gap-2">
                 <h3 className="text-lg font-bold text-navy-900">{m.grant_listings?.title ?? '공고'}</h3>
                 <span className={`shrink-0 rounded-full px-2.5 py-1 text-sm font-semibold ${VERDICT_STYLE[m.verdict]}`}>
@@ -103,7 +103,7 @@ export function ResultsView({
       {diagnosis && (
         <section>
           <h2 className="text-base font-bold text-neutral-500">1순위 공고 미니 4축 예비진단</h2>
-          <div className="mt-4 rounded-xl border border-neutral-200 p-6">
+          <div className="mt-4 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
             <p className="text-4xl font-extrabold text-navy-900">{diagnosis.total_score} <span className="text-xl text-neutral-400">/ 100</span></p>
             <dl className="mt-5 grid grid-cols-2 gap-4 text-base sm:grid-cols-4">
               <Score label="관련성" value={diagnosis.relevance_score} />
