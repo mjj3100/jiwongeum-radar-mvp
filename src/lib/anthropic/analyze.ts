@@ -49,17 +49,26 @@ const FEW_SHOT_EXAMPLE = `
 - 합계 73/100: 신청 검토 가능. 단, 실행계획·차별성 보강 필요
 `.trim()
 
+// 실제 공고 원문(target_desc/support_content 등)은 API 소스마다 길이 편차가 커서,
+// 그대로 다 넣으면 프롬프트가 비대해져 응답이 max_tokens에서 잘릴 수 있다.
+// 판정에 필요한 핵심만 남기고 잘라낸다.
+function truncate(text: string | null, maxLen: number, fallback = '미상'): string {
+  if (!text) return fallback
+  const clean = text.replace(/\s+/g, ' ').trim()
+  return clean.length > maxLen ? `${clean.slice(0, maxLen)}…` : clean
+}
+
 function buildUserPrompt(profile: BusinessProfileInput, candidates: GrantListing[]): string {
   const candidateBlock = candidates
     .map(
       (c, i) => `
 [공고 ${i + 1}] id=${c.id}
-제목: ${c.title}
+제목: ${truncate(c.title, 120)}
 기관: ${c.agency ?? '미상'}
-신청대상: ${c.target_desc ?? '미상'}
-제외대상: ${c.exclude_desc ?? '없음'}
-지원내용: ${c.support_content ?? '미상'}
-지원규모: ${c.support_scale ?? '미상'}
+신청대상: ${truncate(c.target_desc, 300)}
+제외대상: ${truncate(c.exclude_desc, 150, '없음')}
+지원내용: ${truncate(c.support_content, 300)}
+지원규모: ${truncate(c.support_scale, 150)}
 `.trim()
     )
     .join('\n\n')
@@ -110,7 +119,7 @@ function extractJson(text: string): unknown {
 async function callClaude(profile: BusinessProfileInput, candidates: GrantListing[]) {
   const message = await client.messages.create({
     model: MODEL,
-    max_tokens: 4096,
+    max_tokens: 8192,
     system: GUARDRAIL_SYSTEM_PROMPT,
     messages: [{ role: 'user', content: buildUserPrompt(profile, candidates) }],
   })
