@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { isAdminEmail } from '@/lib/admin-auth'
 import { AppShell } from '@/components/AppShell'
 import { CreateOrderForm } from './CreateOrderForm'
+import { DeleteOrderButton } from './DeleteOrderButton'
 
 export default async function AdminOrdersPage() {
   const supabase = await createClient()
@@ -23,7 +24,7 @@ export default async function AdminOrdersPage() {
     .limit(20)
 
   return (
-    <AppShell>
+    <AppShell isAdmin>
       <div className="mx-auto max-w-2xl space-y-10">
         <div>
           <p className="eyebrow text-teal-dark">ADMIN</p>
@@ -46,6 +47,7 @@ export default async function AdminOrdersPage() {
                   <th className="px-4 py-2 font-semibold">상품</th>
                   <th className="px-4 py-2 font-semibold">상태</th>
                   <th className="px-4 py-2 font-semibold">등록일</th>
+                  <th className="px-4 py-2 font-semibold">관리</th>
                 </tr>
               </thead>
               <tbody>
@@ -57,11 +59,14 @@ export default async function AdminOrdersPage() {
                     <td className="px-4 py-2 text-neutral-400">
                       {new Date(o.created_at).toLocaleString('ko-KR')}
                     </td>
+                    <td className="px-4 py-2">
+                      <DeleteOrderButton orderNo={o.order_no} claimed={Boolean(o.claimed_by)} />
+                    </td>
                   </tr>
                 ))}
                 {(!orders || orders.length === 0) && (
                   <tr>
-                    <td colSpan={4} className="px-4 py-6 text-center text-neutral-400">
+                    <td colSpan={5} className="px-4 py-6 text-center text-neutral-400">
                       등록된 주문이 없습니다.
                     </td>
                   </tr>

@@ -46,3 +46,39 @@ export async function createOrder(
   revalidatePath('/admin/orders')
   return { error: '', success: true }
 }
+
+/**
+ * 환불 등으로 주문을 취소할 때 사용한다. 이미 클레임된 주문이면 orders 행만 지워서는
+ * 이용권이 남아있으므로, 해당 상품의 entitlements도 함께 회수한다.
+ */
+export async function deleteOrder(formData: FormData): Promise<void> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!isAdminEmail(user?.email)) {
+    redirect('/login')
+  }
+
+  const orderNo = String(formData.get('order_no') || '')
+  const admin = createAdminClient()
+
+  const { data: order } = await admin
+    .from('orders')
+    .select('claimed_by, product')
+    .eq('order_no', orderNo)
+    .maybeSingle()
+
+  if (order?.claimed_by) {
+    await admin
+      .from('entitlements')
+      .delete()
+      .eq('user_id', order.claimed_by)
+      .eq('product', order.product)
+  }
+
+  await admin.from('orders').delete().eq('order_no', orderNo)
+
+  revalidatePath('/admin/orders')
+}

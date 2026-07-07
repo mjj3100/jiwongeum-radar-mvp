@@ -6,6 +6,7 @@ import { AppShell } from '@/components/AppShell'
 import { BusinessProfileForm } from './BusinessProfileForm'
 import { ResultsView } from './ResultsView'
 import type { BusinessProfileInput } from '@/lib/types'
+import { isAdminEmail } from '@/lib/admin-auth'
 
 export default async function ResultPage({
   searchParams,
@@ -30,6 +31,7 @@ export default async function ResultPage({
     )
   }
 
+  const isAdmin = isAdminEmail(user.email)
   const admin = createAdminClient()
 
   const { data: entitlements } = await admin
@@ -55,7 +57,7 @@ export default async function ResultPage({
     }
 
     return (
-      <AppShell>
+      <AppShell isAdmin={isAdmin}>
         <div className="mx-auto max-w-lg text-center">
           <h1 className="text-2xl font-extrabold text-navy-900">이용권이 확인되지 않습니다</h1>
           <p className="mt-3 text-base text-neutral-600">
@@ -77,7 +79,7 @@ export default async function ResultPage({
 
   if (!businessProfile || edit === '1') {
     return (
-      <AppShell>
+      <AppShell isAdmin={isAdmin}>
         <BusinessProfileForm defaultValues={businessProfile as BusinessProfileInput | undefined} />
       </AppShell>
     )
@@ -93,7 +95,7 @@ export default async function ResultPage({
   ])
 
   return (
-    <AppShell>
+    <AppShell isAdmin={isAdmin}>
       <ResultsView
         matches={matches ?? []}
         diagnosis={diagnoses?.[0] ?? null}

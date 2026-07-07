@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { claimOrder } from '@/lib/claim-order'
 import { AppShell } from '@/components/AppShell'
 import { PendingRetryForm } from './PendingRetryForm'
+import { isAdminEmail } from '@/lib/admin-auth'
 
 export default async function PendingPage() {
   const supabase = await createClient()
@@ -36,7 +37,7 @@ export default async function PendingPage() {
   }
 
   return (
-    <AppShell>
+    <AppShell isAdmin={isAdminEmail(user.email)}>
       <div className="mx-auto max-w-lg space-y-6 text-center">
         <h1 className="text-2xl font-extrabold text-navy-900">결제 확인 중이에요</h1>
         <p className="text-base text-neutral-600">
