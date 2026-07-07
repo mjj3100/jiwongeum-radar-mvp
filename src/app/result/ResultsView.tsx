@@ -115,10 +115,14 @@ export function ResultsView({
               {m.caution_note && (
                 <p className="mt-2 text-sm text-amber-700">주의: {m.caution_note}</p>
               )}
-              {(m.grant_listings?.support_scale || m.grant_listings?.support_content) && (
-                <p className="mt-2 text-sm text-neutral-500">
-                  지원 규모: {m.grant_listings?.support_scale ?? m.grant_listings?.support_content}
-                </p>
+              {m.grant_listings?.support_scale ? (
+                <p className="mt-2 text-sm text-neutral-500">지원 규모: {m.grant_listings.support_scale}</p>
+              ) : (
+                m.grant_listings?.support_content && (
+                  <p className="mt-2 text-sm text-neutral-500">
+                    지원 내용: {truncate(m.grant_listings.support_content, 150)}
+                  </p>
+                )
               )}
               <div className="mt-3 flex items-center justify-between">
                 <p className="text-sm text-neutral-400">준비 우선순위 {m.prep_priority}</p>
@@ -177,6 +181,11 @@ export function ResultsView({
       </p>
     </div>
   )
+}
+
+function truncate(text: string, maxLen: number): string {
+  const clean = text.replace(/\s+/g, ' ').trim()
+  return clean.length > maxLen ? `${clean.slice(0, maxLen)}…` : clean
 }
 
 function Score({ label, value }: { label: string; value: number }) {

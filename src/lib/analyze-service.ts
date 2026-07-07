@@ -51,7 +51,13 @@ export async function runAnalysisForUser(
     return { ok: false, error: 'no_business_profile' }
   }
 
-  const { data: listings } = await admin.from('grant_listings').select('*')
+  // source='manual'은 K-Startup/기업마당 API 키 발급 전 임시 검증용 시드 데이터였다.
+  // 실시간 API 연동이 안정화된 지금은 매칭 후보에서 제외한다 (원문 URL이 없어 결과에서
+  // 링크가 비는 문제의 원인이기도 하다). API 장애 시 수동 복구용으로 테이블엔 남겨둔다.
+  const { data: listings } = await admin
+    .from('grant_listings')
+    .select('*')
+    .in('source', ['kstartup', 'bizinfo'])
   const candidates = ruleBasedFilter(profile, (listings ?? []) as GrantListing[])
   const topCandidates = candidates.slice(0, 8)
 
