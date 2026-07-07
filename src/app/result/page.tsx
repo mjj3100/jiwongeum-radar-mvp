@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { AppShell } from '@/components/AppShell'
@@ -43,6 +44,16 @@ export default async function ResultPage({
   )
 
   if (!hasBundle && !hasActiveStarter) {
+    const { data: profile } = await admin
+      .from('profiles')
+      .select('pending_order_no')
+      .eq('id', user.id)
+      .maybeSingle()
+
+    if (profile?.pending_order_no) {
+      redirect('/pending')
+    }
+
     return (
       <AppShell>
         <div className="mx-auto max-w-lg text-center">
@@ -75,7 +86,7 @@ export default async function ResultPage({
   const [{ data: matches }, { data: diagnoses }] = await Promise.all([
     admin
       .from('match_results')
-      .select('*, grant_listings(title)')
+      .select('*, grant_listings(title, original_url, support_content, support_scale)')
       .eq('user_id', user.id)
       .order('prep_priority', { ascending: true }),
     admin.from('diagnosis_reports').select('*').eq('user_id', user.id).limit(1),

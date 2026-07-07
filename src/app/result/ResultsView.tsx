@@ -12,7 +12,12 @@ interface MatchRow {
   fit_reason: string
   caution_note: string | null
   prep_priority: number
-  grant_listings: { title: string } | null
+  grant_listings: {
+    title: string
+    original_url: string | null
+    support_content: string | null
+    support_scale: string | null
+  } | null
 }
 
 interface DiagnosisRow {
@@ -110,7 +115,24 @@ export function ResultsView({
               {m.caution_note && (
                 <p className="mt-2 text-sm text-amber-700">주의: {m.caution_note}</p>
               )}
-              <p className="mt-2 text-sm text-neutral-400">준비 우선순위 {m.prep_priority}</p>
+              {(m.grant_listings?.support_scale || m.grant_listings?.support_content) && (
+                <p className="mt-2 text-sm text-neutral-500">
+                  지원 규모: {m.grant_listings?.support_scale ?? m.grant_listings?.support_content}
+                </p>
+              )}
+              <div className="mt-3 flex items-center justify-between">
+                <p className="text-sm text-neutral-400">준비 우선순위 {m.prep_priority}</p>
+                {m.grant_listings?.original_url && (
+                  <a
+                    href={m.grant_listings.original_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-semibold text-teal-dark hover:underline"
+                  >
+                    원문 공고 보기 ↗
+                  </a>
+                )}
+              </div>
             </li>
           ))}
         </ul>
@@ -119,6 +141,10 @@ export function ResultsView({
       {diagnosis && (
         <section>
           <h2 className="text-base font-bold text-neutral-500">1순위 공고 미니 4축 예비진단</h2>
+          <p className="mt-1 text-sm text-neutral-400">
+            입력하신 요약 정보를 기준으로 낸 약식 진단이에요. 실제 사업계획서를 바탕으로 한 상세 진단은
+            아니니, 점수보다 아래 요약과 위험 문장 코멘트를 참고용으로 봐주세요.
+          </p>
           <div className="mt-4 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
             <p className="text-4xl font-extrabold text-navy-900">{diagnosis.total_score} <span className="text-xl text-neutral-400">/ 100</span></p>
             <dl className="mt-5 grid grid-cols-2 gap-4 text-base sm:grid-cols-4">

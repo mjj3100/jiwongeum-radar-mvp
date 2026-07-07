@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { RadarLogo, RadarGlow } from '@/components/RadarLogo'
-import { LITTLY_URL_BUNDLE, LITTLY_URL_STARTER, PRICING } from '@/lib/constants'
+import { LITTLY_URL_BUNDLE, LITTLY_URL_STARTER, PRICING, SHOW_STARTER_ON_LANDING } from '@/lib/constants'
 
 const FRICTION_POINTS = [
   '이 공고, 내가 신청 가능한가? 자격 해석이 어렵다',
@@ -132,7 +132,7 @@ export default function LandingPage() {
       <section className="mx-auto max-w-4xl px-6 py-24">
         <p className="eyebrow text-teal-dark">PRICING</p>
         <h2 className="mt-3 text-3xl font-extrabold text-navy-900 sm:text-4xl">이용 방법</h2>
-        <div className="mt-10 grid gap-6 sm:grid-cols-2">
+        <div className={`mt-10 grid gap-6 ${SHOW_STARTER_ON_LANDING ? 'sm:grid-cols-2' : 'mx-auto max-w-md'}`}>
           <div className="rounded-2xl border-2 border-teal bg-white p-8 shadow-[0_8px_30px_rgba(0,212,170,0.12)]">
             <p className="eyebrow text-teal-dark">{PRICING.bundle.name}</p>
             <p className="mt-3 text-sm text-neutral-500">1회 결제 · 즉시 진단</p>
@@ -148,23 +148,25 @@ export default function LandingPage() {
               결제하고 시작하기
             </a>
           </div>
-          <div className="rounded-2xl border border-navy-900/10 bg-white p-8">
-            <p className="eyebrow text-teal-dark">{PRICING.starter.name}</p>
-            <p className="mt-3 text-sm text-neutral-500">
-              월 {PRICING.starter.price.toLocaleString()}원
-            </p>
-            <ul className="mt-6 space-y-2.5 text-base text-neutral-700">
-              {PRICING.starter.features.map((f) => (
-                <li key={f} className="flex gap-2.5">
-                  <span className="font-bold text-teal-dark">✓</span>
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <a href={LITTLY_URL_STARTER} className="btn-outline mt-8 w-full text-center text-base">
-              구독 시작하기
-            </a>
-          </div>
+          {SHOW_STARTER_ON_LANDING && (
+            <div className="rounded-2xl border border-navy-900/10 bg-white p-8">
+              <p className="eyebrow text-teal-dark">{PRICING.starter.name}</p>
+              <p className="mt-3 text-sm text-neutral-500">
+                월 {PRICING.starter.price.toLocaleString()}원
+              </p>
+              <ul className="mt-6 space-y-2.5 text-base text-neutral-700">
+                {PRICING.starter.features.map((f) => (
+                  <li key={f} className="flex gap-2.5">
+                    <span className="font-bold text-teal-dark">✓</span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <a href={LITTLY_URL_STARTER} className="btn-outline mt-8 w-full text-center text-base">
+                구독 시작하기
+              </a>
+            </div>
+          )}
         </div>
       </section>
 
@@ -172,7 +174,7 @@ export default function LandingPage() {
       <section className="bg-navy-950 py-24">
         <div className="mx-auto max-w-4xl px-6">
           <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
-            지원금 레이더를 구독해야 하는 이유
+            지원금 레이더를 써야 하는 이유
           </h2>
           <ol className="mt-10 space-y-5">
             {REASONS.map((reason, i) => (
