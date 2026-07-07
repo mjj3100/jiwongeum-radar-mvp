@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { isAdminEmail } from '@/lib/admin-auth'
 
 export async function login(formData: FormData): Promise<{ error: string } | never> {
   const email = String(formData.get('email') || '').trim()
@@ -19,5 +20,5 @@ export async function login(formData: FormData): Promise<{ error: string } | nev
     return { error: '이메일 또는 비밀번호가 올바르지 않습니다.' }
   }
 
-  redirect('/result')
+  redirect(isAdminEmail(email) ? '/admin/orders' : '/result')
 }
