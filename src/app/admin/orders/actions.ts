@@ -76,6 +76,18 @@ export async function deleteOrder(formData: FormData): Promise<void> {
       .delete()
       .eq('user_id', order.claimed_by)
       .eq('product', order.product)
+
+    // 남은 이용권이 하나도 없으면 profiles.status도 pending으로 되돌린다.
+    // 그래야 /pending이 "이미 active"로 오판해 /result와 무한 리다이렉트에
+    // 빠지지 않는다.
+    const { data: remaining } = await admin
+      .from('entitlements')
+      .select('product')
+      .eq('user_id', order.claimed_by)
+
+    if (!remaining || remaining.length === 0) {
+      await admin.from('profiles').update({ status: 'pending' }).eq('id', order.claimed_by)
+    }
   }
 
   await admin.from('orders').delete().eq('order_no', orderNo)

@@ -45,30 +45,11 @@ export default async function ResultPage({
     (e) => e.product === 'starter' && e.expires_at && new Date(e.expires_at) > new Date()
   )
 
+  // 이용권이 없는 로그인 계정은 전부 /pending으로 보낸다 — 최초 승인 대기 중이든,
+  // 환불로 이용권이 회수된 뒤 재구매해 새 주문번호를 입력해야 하는 경우든 동일하게
+  // 여기서 주문번호를 (재)입력해 재클레임을 시도할 수 있다.
   if (!hasBundle && !hasActiveStarter) {
-    const { data: profile } = await admin
-      .from('profiles')
-      .select('pending_order_no')
-      .eq('id', user.id)
-      .maybeSingle()
-
-    if (profile?.pending_order_no) {
-      redirect('/pending')
-    }
-
-    return (
-      <AppShell isAdmin={isAdmin}>
-        <div className="mx-auto max-w-lg text-center">
-          <h1 className="text-2xl font-extrabold text-navy-900">이용권이 확인되지 않습니다</h1>
-          <p className="mt-3 text-base text-neutral-600">
-            결제 후 안내받은 주문번호로 가입하면 바로 이용하실 수 있어요.
-          </p>
-          <Link href="/" className="btn-primary mt-8 inline-block">
-            결제 안내 보러가기
-          </Link>
-        </div>
-      </AppShell>
-    )
+    redirect('/pending')
   }
 
   const { data: businessProfile } = await admin
