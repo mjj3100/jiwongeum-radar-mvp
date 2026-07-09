@@ -1,5 +1,6 @@
 'use server'
 
+import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -52,7 +53,12 @@ export async function submitBusinessProfile(
     return { error: analyzeErrorMessage(outcome.error) }
   }
 
+  // revalidatePath만으로는 URL의 ?edit=1이 그대로 남아 있어, /result/page.tsx의
+  // edit===1 분기가 매번 다시 폼을 보여주는 문제가 있었다(분석이 성공해도 결과
+  // 화면 대신 폼으로 되돌아가는 것처럼 보임). edit 파라미터를 없앤 /result로
+  // 명시적으로 이동시켜야 결과 화면이 실제로 렌더링된다.
   revalidatePath('/result')
+  redirect('/result')
 }
 
 export async function rerunAnalysis(): Promise<{ error: string } | undefined> {
