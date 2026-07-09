@@ -40,13 +40,6 @@ const VERDICT_STYLE: Record<Verdict, string> = {
   비추천: 'bg-neutral-100 text-neutral-600',
 }
 
-const VERDICT_ACCENT: Record<Verdict, string> = {
-  추천: 'border-l-green-400',
-  조건부: 'border-l-yellow-400',
-  '확인 필요': 'border-l-blue-400',
-  비추천: 'border-l-neutral-300',
-}
-
 export function ResultsView({
   matches,
   diagnosis,
@@ -58,6 +51,7 @@ export function ResultsView({
 }) {
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState('')
+  const topMatchTitle = matches.find((m) => m.prep_priority === 1)?.grant_listings?.title ?? null
 
   const handleRerun = () => {
     setError('')
@@ -113,55 +107,73 @@ export function ResultsView({
           </div>
         )}
         <ul className="mt-4 space-y-4">
-          {matches.map((m) => (
-            <li
-              key={m.id}
-              className={`rounded-xl border border-neutral-200 border-l-4 bg-white p-5 shadow-[0_8px_24px_rgba(10,19,48,0.05)] ${VERDICT_ACCENT[m.verdict]}`}
-            >
-              <div className="flex items-start justify-between gap-2">
-                <h3 className="text-lg font-bold text-navy-900">{m.grant_listings?.title ?? '공고'}</h3>
-                <div className="flex shrink-0 items-center gap-2">
+          {matches.map((m) => {
+            const isTop = m.prep_priority === 1
+            return (
+              <li
+                key={m.id}
+                className={`rounded-xl border bg-white p-5 ${
+                  isTop
+                    ? 'border-teal-dark/30 border-l-4 border-l-teal-dark shadow-[0_10px_32px_rgba(0,212,170,0.14)]'
+                    : 'border-neutral-200 border-l-4 border-l-neutral-200 shadow-[0_8px_24px_rgba(10,19,48,0.05)]'
+                }`}
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  <span
+                    className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                      isTop ? 'bg-teal-dark text-white' : 'bg-neutral-100 text-neutral-500'
+                    }`}
+                  >
+                    {m.prep_priority}순위
+                  </span>
+                  {isTop && (
+                    <span className="rounded-full bg-teal-tint px-2.5 py-1 text-xs font-bold text-teal-dark">
+                      미니 4축 진단 포함
+                    </span>
+                  )}
                   <DdayBadge applyEnd={m.grant_listings?.apply_end ?? null} />
                   <span className={`rounded-full px-2.5 py-1 text-sm font-semibold ${VERDICT_STYLE[m.verdict]}`}>
                     {m.verdict}
                   </span>
                 </div>
-              </div>
-              <p className="mt-2 text-base text-neutral-600">{m.fit_reason}</p>
-              {m.caution_note && (
-                <p className="mt-2 text-sm text-amber-700">주의: {m.caution_note}</p>
-              )}
-              {m.grant_listings?.support_scale ? (
-                <p className="mt-2 text-sm text-neutral-500">지원 규모: {m.grant_listings.support_scale}</p>
-              ) : (
-                m.grant_listings?.support_content && (
-                  <p className="mt-2 text-sm text-neutral-500">
-                    지원 내용: {truncate(m.grant_listings.support_content, 150)}
-                  </p>
-                )
-              )}
-              <div className="mt-3 flex items-center justify-between">
-                <p className="text-sm text-neutral-400">준비 우선순위 {m.prep_priority}</p>
-                {m.grant_listings?.original_url && (
-                  <a
-                    href={m.grant_listings.original_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-semibold text-teal-dark hover:underline"
-                  >
-                    원문 공고 보기 ↗
-                  </a>
+                <h3 className="mt-3 text-lg font-bold text-navy-900">{m.grant_listings?.title ?? '공고'}</h3>
+                <p className="mt-2 text-base text-neutral-600">{m.fit_reason}</p>
+                {m.caution_note && (
+                  <p className="mt-2 text-sm text-amber-700">주의: {m.caution_note}</p>
                 )}
-              </div>
-            </li>
-          ))}
+                {m.grant_listings?.support_scale ? (
+                  <p className="mt-2 text-sm text-neutral-500">지원 규모: {m.grant_listings.support_scale}</p>
+                ) : (
+                  m.grant_listings?.support_content && (
+                    <p className="mt-2 text-sm text-neutral-500">
+                      지원 내용: {truncate(m.grant_listings.support_content, 150)}
+                    </p>
+                  )
+                )}
+                {m.grant_listings?.original_url && (
+                  <div className="mt-3 flex justify-end">
+                    <a
+                      href={m.grant_listings.original_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-semibold text-teal-dark hover:underline"
+                    >
+                      원문 공고 보기 ↗
+                    </a>
+                  </div>
+                )}
+              </li>
+            )
+          })}
         </ul>
       </section>
 
       {diagnosis && (
         <section>
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <h2 className="text-base font-bold text-neutral-500">1순위 공고 미니 4축 예비진단</h2>
+            <h2 className="text-base font-bold text-neutral-500">
+              1순위{topMatchTitle ? ` · ${topMatchTitle}` : ''} 미니 4축 예비진단
+            </h2>
             <p className="text-xs text-neutral-400">{formatDateTime(diagnosis.created_at)} 기준</p>
           </div>
           <p className="mt-1 text-sm text-neutral-400">

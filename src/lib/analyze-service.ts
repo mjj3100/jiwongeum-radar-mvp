@@ -91,9 +91,17 @@ export async function runAnalysisForUser(
   }
 
   if (result.diagnosis) {
+    // 화면은 prep_priority 오름차순으로 "1순위"를 정한다. Claude가 반환한 matches 배열
+    // 순서가 항상 prep_priority 순이라는 보장이 없어(대체로 같지만 어긋날 수 있음),
+    // matches[0]을 그냥 쓰면 진단이 화면에 표시되는 1순위 공고와 다른 공고에 붙는
+    // 불일치가 생긴다. prep_priority가 가장 낮은(=1순위) 매치를 명시적으로 찾는다.
+    const topPriorityMatch = result.matches.reduce(
+      (top, m) => (m.prep_priority < top.prep_priority ? m : top),
+      result.matches[0]
+    )
     const { error: diagnosisError } = await admin.from('diagnosis_reports').insert({
       user_id: userId,
-      grant_listing_id: result.matches[0]?.grant_listing_id ?? null,
+      grant_listing_id: topPriorityMatch?.grant_listing_id ?? null,
       relevance_score: result.diagnosis.relevance_score,
       concreteness_score: result.diagnosis.concreteness_score,
       differentiation_score: result.diagnosis.differentiation_score,
