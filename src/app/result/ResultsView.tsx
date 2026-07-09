@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { rerunAnalysis } from './actions'
-import type { RiskSentence, Verdict } from '@/lib/types'
+import type { AxisReasons, RiskSentence, Verdict } from '@/lib/types'
 
 interface MatchRow {
   id: string
@@ -17,6 +17,7 @@ interface MatchRow {
     original_url: string | null
     support_content: string | null
     support_scale: string | null
+    apply_end: string | null
   } | null
 }
 
@@ -26,8 +27,10 @@ interface DiagnosisRow {
   differentiation_score: number
   feasibility_score: number
   total_score: number
+  axis_reasons: AxisReasons | null
   risk_sentences: RiskSentence[]
   summary: string
+  created_at: string
 }
 
 const VERDICT_STYLE: Record<Verdict, string> = {
@@ -59,12 +62,12 @@ export function ResultsView({
 
   return (
     <div className="mx-auto max-w-2xl space-y-10">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-extrabold text-navy-900">맞춤 지원사업 진단 결과</h1>
         <div className="flex items-center gap-2">
           <Link
             href="/result?edit=1"
-            className="rounded-md border border-navy-900/15 px-4 py-2 text-sm font-semibold text-navy-900 hover:bg-navy-900/5"
+            className="whitespace-nowrap rounded-md border border-navy-900/15 px-4 py-2 text-sm font-semibold text-navy-900 hover:bg-navy-900/5"
           >
             정보 수정하기
           </Link>
@@ -72,7 +75,7 @@ export function ResultsView({
             <button
               onClick={handleRerun}
               disabled={pending}
-              className="rounded-md border border-teal-dark/40 px-4 py-2 text-sm font-semibold text-teal-dark hover:bg-teal-tint disabled:opacity-50"
+              className="whitespace-nowrap rounded-md border border-teal-dark/40 px-4 py-2 text-sm font-semibold text-teal-dark hover:bg-teal-tint disabled:opacity-50"
             >
               {pending ? '다시 분석 중...' : '다시 진단받기'}
             </button>
@@ -107,9 +110,12 @@ export function ResultsView({
             <li key={m.id} className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
               <div className="flex items-start justify-between gap-2">
                 <h3 className="text-lg font-bold text-navy-900">{m.grant_listings?.title ?? '공고'}</h3>
-                <span className={`shrink-0 rounded-full px-2.5 py-1 text-sm font-semibold ${VERDICT_STYLE[m.verdict]}`}>
-                  {m.verdict}
-                </span>
+                <div className="flex shrink-0 items-center gap-2">
+                  <DdayBadge applyEnd={m.grant_listings?.apply_end ?? null} />
+                  <span className={`rounded-full px-2.5 py-1 text-sm font-semibold ${VERDICT_STYLE[m.verdict]}`}>
+                    {m.verdict}
+                  </span>
+                </div>
               </div>
               <p className="mt-2 text-base text-neutral-600">{m.fit_reason}</p>
               {m.caution_note && (
@@ -144,18 +150,21 @@ export function ResultsView({
 
       {diagnosis && (
         <section>
-          <h2 className="text-base font-bold text-neutral-500">1순위 공고 미니 4축 예비진단</h2>
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <h2 className="text-base font-bold text-neutral-500">1순위 공고 미니 4축 예비진단</h2>
+            <p className="text-xs text-neutral-400">{formatDateTime(diagnosis.created_at)} 기준</p>
+          </div>
           <p className="mt-1 text-sm text-neutral-400">
             입력하신 요약 정보를 기준으로 낸 약식 진단이에요. 실제 사업계획서를 바탕으로 한 상세 진단은
             아니니, 점수보다 아래 요약과 위험 문장 코멘트를 참고용으로 봐주세요.
           </p>
           <div className="mt-4 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
             <p className="text-4xl font-extrabold text-navy-900">{diagnosis.total_score} <span className="text-xl text-neutral-400">/ 100</span></p>
-            <dl className="mt-5 grid grid-cols-2 gap-4 text-base sm:grid-cols-4">
-              <Score label="관련성" value={diagnosis.relevance_score} />
-              <Score label="구체성" value={diagnosis.concreteness_score} />
-              <Score label="차별성" value={diagnosis.differentiation_score} />
-              <Score label="실현가능성" value={diagnosis.feasibility_score} />
+            <dl className="mt-5 grid grid-cols-1 gap-5 text-base sm:grid-cols-2">
+              <Score label="관련성" value={diagnosis.relevance_score} reason={diagnosis.axis_reasons?.relevance} />
+              <Score label="구체성" value={diagnosis.concreteness_score} reason={diagnosis.axis_reasons?.concreteness} />
+              <Score label="차별성" value={diagnosis.differentiation_score} reason={diagnosis.axis_reasons?.differentiation} />
+              <Score label="실현가능성" value={diagnosis.feasibility_score} reason={diagnosis.axis_reasons?.feasibility} />
             </dl>
             <p className="mt-5 text-base text-neutral-600">{diagnosis.summary}</p>
 
@@ -188,11 +197,51 @@ function truncate(text: string, maxLen: number): string {
   return clean.length > maxLen ? `${clean.slice(0, maxLen)}…` : clean
 }
 
-function Score({ label, value }: { label: string; value: number }) {
+function Score({ label, value, reason }: { label: string; value: number; reason?: string }) {
   return (
     <div>
-      <dt className="text-sm text-neutral-400">{label}</dt>
-      <dd className="text-lg font-bold text-navy-900">{value}/25</dd>
+      <div className="flex items-baseline justify-between">
+        <dt className="text-sm text-neutral-400">{label}</dt>
+        <dd className="text-lg font-bold text-navy-900">{value}/25</dd>
+      </div>
+      <div className="mt-1 h-1.5 w-full rounded-full bg-neutral-100">
+        <div className="h-1.5 rounded-full bg-teal-dark" style={{ width: `${(value / 25) * 100}%` }} />
+      </div>
+      {reason && <p className="mt-2 text-sm text-neutral-500">{reason}</p>}
     </div>
+  )
+}
+
+function formatDateTime(iso: string): string {
+  return new Date(iso).toLocaleString('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+function DdayBadge({ applyEnd }: { applyEnd: string | null }) {
+  if (!applyEnd) return null
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const end = new Date(applyEnd)
+  const diffDays = Math.round((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+
+  if (diffDays < 0) return null
+
+  const label = diffDays === 0 ? 'D-day' : `D-${diffDays}`
+  const urgent = diffDays <= 7
+
+  return (
+    <span
+      className={`rounded-full px-2.5 py-1 text-sm font-semibold ${
+        urgent ? 'bg-red-100 text-red-700' : 'bg-neutral-100 text-neutral-500'
+      }`}
+    >
+      {label}
+    </span>
   )
 }

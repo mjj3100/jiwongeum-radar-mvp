@@ -61,12 +61,20 @@ export interface RiskSentence {
   suggestion: string
 }
 
+export interface AxisReasons {
+  relevance: string
+  concreteness: string
+  differentiation: string
+  feasibility: string
+}
+
 export interface DiagnosisReport {
   relevance_score: number
   concreteness_score: number
   differentiation_score: number
   feasibility_score: number
   total_score: number
+  axis_reasons: AxisReasons
   risk_sentences: RiskSentence[]
   summary: string
 }

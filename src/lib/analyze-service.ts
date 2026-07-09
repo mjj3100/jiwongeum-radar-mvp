@@ -95,6 +95,7 @@ export async function runAnalysisForUser(
       concreteness_score: result.diagnosis.concreteness_score,
       differentiation_score: result.diagnosis.differentiation_score,
       feasibility_score: result.diagnosis.feasibility_score,
+      axis_reasons: result.diagnosis.axis_reasons,
       risk_sentences: result.diagnosis.risk_sentences,
       summary: result.diagnosis.summary,
     })

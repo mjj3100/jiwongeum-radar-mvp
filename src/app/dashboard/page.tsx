@@ -78,7 +78,7 @@ export default async function DashboardPage() {
   const [{ data: matches }, { data: diagnoses }] = await Promise.all([
     admin
       .from('match_results')
-      .select('*, grant_listings(title)')
+      .select('*, grant_listings(title, original_url, support_content, support_scale, apply_end)')
       .eq('user_id', user.id)
       .order('prep_priority', { ascending: true }),
     admin.from('diagnosis_reports').select('*').eq('user_id', user.id).limit(1),

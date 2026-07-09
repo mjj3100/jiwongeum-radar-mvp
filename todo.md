@@ -114,7 +114,7 @@
 - [x] FAQ 4문항 페이지 (`/faq`) — 환불/재진단 규칙/HWP 안내/진단 소요시간. CS 채널(오픈카톡) 링크는 `SiteFooter.tsx`에 준비중 표시로 노출(실제 링크는 사람이 채워야 함)
 
 ## Phase 11 (보고서 §4 Phase 2) — 9,900 완성 + 랜딩 개편 (1~2주, ~7/30까지)
-- [ ] 예비진단 리프레이밍: 4축 진단 결과 화면에 축별 사유 문구 자동 생성 프롬프트 추가 (`src/lib/analyze-service.ts` 프롬프트 확장)
+- [x] 예비진단 리프레이밍: 4축 진단 결과 화면에 축별 사유 문구 자동 생성 프롬프트 추가 — `diagnosis_reports.axis_reasons` jsonb 컬럼 신규(마이그레이션 0007), Claude 스키마·프롬프트·`ResultsView` 점수 바 하단에 축별 사유 표시까지 완료
 - [ ] 업셀 블록: 19,900 유도 CTA + "9,900원은 본진단 결제 시 전액 공제됩니다" 메시지 (`/result` 결과 화면)
 - [ ] 랜딩(`src/app/page.tsx`) 개편:
   - [ ] Before&After 비교 섹션 (실제 공고문 재현 vs 실제 결과 화면 스크린샷)
@@ -126,9 +126,9 @@
 
 ### Phase 11 — 이탈 방지 UX·운영 (보고서 부록 A-2)
 - [ ] 운영자 주문 등록 시 이용권 활성화 알림 이메일 자동 발송 (`/admin/orders/actions.ts` createOrder 훅)
-- [ ] 매칭 쿼리에 `apply_end >= 오늘` 필터 추가 + 결과 카드에 D-day 표시 (`src/lib/grants/match.ts`, `ResultsView.tsx`)
-- [ ] 진단 결과에 생성 일시·데이터 기준일 표기
-- [ ] 모바일 레이아웃 전수 점검 (리틀리 유입 대부분 모바일 — 4축 표/체크리스트 우선 점검)
+- [x] 매칭 쿼리에 `apply_end >= 오늘` 필터 — `src/lib/grants/match.ts`의 `ruleBasedFilter`에 이미 있었음(확인 완료). 결과 카드에 D-day 표시(`DdayBadge`, `ResultsView.tsx`)만 신규 추가 — `/result`, `/dashboard` 양쪽 다 반영
+- [x] 진단 결과에 생성 일시 표기 — `diagnosis_reports.created_at`을 `ResultsView`에 "OO 기준"으로 표시. 데이터 기준일(공고 fetched_at) 표기는 미포함, 필요시 후속 작업
+- [x] 모바일 레이아웃 점검 — 임시 프리뷰 라우트로 `/result` 목업 데이터 렌더링해 375px 확인, 헤더 버튼 줄바꿈 깨짐 발견해 수정(`flex-col sm:flex-row`). `/signup`, `/faq`, `/terms`, 랜딩도 375px에서 확인 완료. `/admin/orders`, `/pending`은 로그인 필요해 코드 리뷰로만 확인(표는 이미 `overflow-x-auto` 처리됨)
 - [ ] Vercel Analytics 퍼널 이벤트 삽입: 랜딩→가격표→가입→클레임→진단완료
 - [ ] Sentry 무료 티어 연동
 

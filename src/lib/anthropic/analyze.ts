@@ -16,11 +16,19 @@ const matchSchema = z.object({
   prep_priority: z.number().int(),
 })
 
+const axisReasonsSchema = z.object({
+  relevance: z.string(),
+  concreteness: z.string(),
+  differentiation: z.string(),
+  feasibility: z.string(),
+})
+
 const diagnosisSchema = z.object({
   relevance_score: z.number().int().min(0).max(25),
   concreteness_score: z.number().int().min(0).max(25),
   differentiation_score: z.number().int().min(0).max(25),
   feasibility_score: z.number().int().min(0).max(25),
+  axis_reasons: axisReasonsSchema,
   risk_sentences: z.array(
     z.object({ quote: z.string(), reason: z.string(), suggestion: z.string() })
   ),
@@ -41,11 +49,11 @@ const FEW_SHOT_EXAMPLE = `
 - "서울 유니콘 챌린지" → 조건부: AI SaaS로 확장성·시장성을 보여줄 수 있으면 적합. 대행업처럼 보이면 약함.
 - "소상공인 정책자금" → 조건부: 운영·개발자금 확보 가능. 융자이므로 상환계획과 자금 목적 확인 필요.
 
-미니 4축 예비진단 샘플 (동일 사례):
-- 관련성 22/25: AI 활용·소상공인 문제 해결과 직접 연결됨
-- 구체성 16/25: 기능·일정은 있으나 고객검증 수치가 부족함
-- 차별성 17/25: 마케팅 대행과 SaaS의 차별 설명 필요
-- 실현가능성 18/25: 수동 테스트 경험은 있으나 개발 견적·일정 보강 필요
+미니 4축 예비진단 샘플 (동일 사례, 점수와 사유를 함께 제시):
+- 관련성 22/25: AI 활용과 소상공인 문제 해결이 직접 연결되어 있어 공고 취지에 부합함
+- 구체성 16/25: 기능·일정은 제시했으나 고객검증 수치(사용자 수·재구매율 등)가 부족함
+- 차별성 17/25: 마케팅 대행업과 SaaS 상품의 차별점을 아직 명확히 구분하지 못함
+- 실현가능성 18/25: 5개 매장 수동 테스트 경험은 있으나 개발 견적·일정 보강이 필요함
 - 합계 73/100: 신청 검토 가능. 단, 실행계획·차별성 보강 필요
 `.trim()
 
@@ -99,14 +107,16 @@ ${candidateBlock}
 작업:
 1. 위 공고 후보 중 적합도 순으로 최대 5개를 골라 각각 판정(추천/조건부/확인 필요/비추천)과 이유(fit_reason),
    주의조건(caution_note, 없으면 null), 준비우선순위(prep_priority, 1이 가장 급함)를 매겨라.
-2. 가장 적합한 1개 공고(1순위)에 대해 미니 4축(관련성/구체성/차별성/실현가능성, 각 0~25점) 예비진단을 하고,
+2. 가장 적합한 1개 공고(1순위)에 대해 미니 4축(관련성/구체성/차별성/실현가능성, 각 0~25점) 예비진단을 하라.
+   각 축마다 "왜 이 점수인지"를 1문장으로 설명하는 사유(axis_reasons)를 반드시 함께 작성하라 —
+   점수만 보여주고 이유를 안 주면 사용자가 무엇을 보완해야 할지 알 수 없다.
    위험 문장이 있다면 사업 아이템 설명에서 지적하라(risk_sentences). 요약(summary)도 작성하라.
    후보가 하나도 없으면 diagnosis는 null로 하라.
 
 다음 JSON 스키마로만 응답하라 (다른 텍스트 없이 JSON만):
 {
   "matches": [{"grant_listing_id": string, "verdict": string, "fit_reason": string, "caution_note": string|null, "prep_priority": number}],
-  "diagnosis": {"relevance_score": number, "concreteness_score": number, "differentiation_score": number, "feasibility_score": number, "risk_sentences": [{"quote": string, "reason": string, "suggestion": string}], "summary": string} | null
+  "diagnosis": {"relevance_score": number, "concreteness_score": number, "differentiation_score": number, "feasibility_score": number, "axis_reasons": {"relevance": string, "concreteness": string, "differentiation": string, "feasibility": string}, "risk_sentences": [{"quote": string, "reason": string, "suggestion": string}], "summary": string} | null
 }
 `.trim()
 }
@@ -149,6 +159,7 @@ export async function analyzeGrants(
   const flatText = [
     ...parsed.matches.flatMap((m) => [m.fit_reason, m.caution_note ?? '']),
     parsed.diagnosis?.summary ?? '',
+    ...(parsed.diagnosis ? Object.values(parsed.diagnosis.axis_reasons) : []),
   ].join('\n')
 
   if (containsBannedPhrase(flatText)) {
@@ -178,6 +189,12 @@ export async function analyzeGrants(
             parsed.diagnosis.concreteness_score +
             parsed.diagnosis.differentiation_score +
             parsed.diagnosis.feasibility_score,
+          axis_reasons: {
+            relevance: sanitize(parsed.diagnosis.axis_reasons.relevance),
+            concreteness: sanitize(parsed.diagnosis.axis_reasons.concreteness),
+            differentiation: sanitize(parsed.diagnosis.axis_reasons.differentiation),
+            feasibility: sanitize(parsed.diagnosis.axis_reasons.feasibility),
+          },
           risk_sentences: parsed.diagnosis.risk_sentences,
           summary: sanitize(parsed.diagnosis.summary),
         }
