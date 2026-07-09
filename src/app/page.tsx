@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { RadarLogo, RadarGlow } from '@/components/RadarLogo'
 import { HeroPreviewCard } from '@/components/HeroPreviewCard'
+import { ReportShowcase } from '@/components/ReportShowcase'
 import { SiteFooter } from '@/components/SiteFooter'
 import { PurchaseConsentGate } from '@/components/PurchaseConsentGate'
 import { signOut } from '@/lib/auth-actions'
@@ -41,6 +42,39 @@ const COMPARE = {
     '제출 전 위험 문장을 찾아 미리 잡아준다',
   ],
 }
+
+const BEFORE_AFTER_TABLE = [
+  { item: '공고 검색', before: '키워드로 직접 검색, 수십 건 훑어봐야 함', after: '조건에 맞는 3~5개만 자동으로 추림' },
+  { item: '자격 판단', before: '공고문을 읽고 스스로 해석', after: '원문 근거로 적합·주의·확인필요를 판정' },
+  { item: '서류 확인', before: '공고마다 다른 서류를 직접 정리', after: '공고 해석 7칸 틀로 미리 정리' },
+  { item: '위험 문장', before: '제출 직전까지 모르고 넘어감', after: '미니 4축 진단에서 미리 짚어줌' },
+  { item: '신청 준비', before: '무엇부터 할지 감이 안 옴', after: '준비 우선순위로 순서를 알려줌' },
+]
+
+const DIFFERENTIATION = [
+  { title: '공고 검색 서비스', desc: '공고를 모아서 보여줄 뿐, 내가 되는지 안 되는지는 알려주지 않습니다.' },
+  { title: '단순 매칭 서비스', desc: '적합·부적합만 알려주고, 왜 그런지 이유는 설명하지 않습니다.' },
+  { title: '지원금 레이더', desc: '적합도 이유, 주의조건, 준비 우선순위, 위험 문장까지 진단으로 끝냅니다.', highlight: true },
+]
+
+const FIT = {
+  good: [
+    '지원사업 공고를 스스로 해석하기 어려운 예비창업자·소상공인',
+    '여러 공고 중 뭐부터 준비해야 할지 모르겠는 분',
+    '제출 직전 사업계획서에 빠진 부분이 있는지 점검하고 싶은 분',
+  ],
+  bad: [
+    '이미 신청할 공고와 전략이 명확히 정해진 분',
+    '합격을 보장해주는 서비스를 찾는 분 (저희는 참고 자료를 제공할 뿐입니다)',
+    '사업계획서 초안 작성을 대신 해주길 원하는 분',
+  ],
+}
+
+const LANDING_FAQS = [
+  { q: '환불 정책이 어떻게 되나요?', a: '진단 결과가 발급된 이후에는 환불이 제한됩니다. 결제 전 안내에서 동의 후 진행됩니다.' },
+  { q: '진단은 얼마나 걸리나요?', a: '결제·정보 입력 직후 1분 이내에 결과가 나옵니다.' },
+  { q: '선정을 보장하나요?', a: '아니요. 제출 전 준비도를 점검하는 참고 자료이며, 합격·선정 여부를 보장하지 않습니다.' },
+]
 
 const INTERPRETATION_FRAME = [
   '신청대상',
@@ -210,6 +244,30 @@ export default async function LandingPage() {
             이 서비스는 공고를 무작정 많이 보여주지 않습니다. 내 조건에 맞는 공고를 골라
             &lsquo;신청 준비를 시작하게&rsquo; 만드는 것이 목표입니다.
           </div>
+
+          <div className="mt-16">
+            <h3 className="text-xl font-extrabold text-navy-900">지원금 레이더를 켜기 전과 후</h3>
+            <div className="mt-6 overflow-x-auto rounded-2xl border border-neutral-200 bg-white">
+              <table className="w-full text-left text-sm sm:text-base">
+                <thead>
+                  <tr className="border-b border-neutral-200 bg-neutral-50 text-neutral-400">
+                    <th className="px-5 py-3 font-semibold">구분</th>
+                    <th className="px-5 py-3 font-semibold">켜기 전</th>
+                    <th className="px-5 py-3 font-semibold text-teal-dark">지원금 레이더 이용 후</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {BEFORE_AFTER_TABLE.map((row) => (
+                    <tr key={row.item} className="border-b border-neutral-100 last:border-0">
+                      <td className="px-5 py-4 font-bold text-navy-900">{row.item}</td>
+                      <td className="px-5 py-4 text-neutral-500">{row.before}</td>
+                      <td className="px-5 py-4 font-medium text-navy-900">{row.after}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -233,6 +291,78 @@ export default async function LandingPage() {
                 <span className="text-sm font-bold text-navy-900 sm:text-base">{label}</span>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 찾아주는 서비스 vs 진단해주는 서비스 */}
+      <section className="bg-neutral-50 py-24">
+        <div className="mx-auto max-w-4xl px-6">
+          <p className="eyebrow text-teal-dark">DIFFERENCE</p>
+          <h2 className="mt-3 text-3xl font-extrabold text-navy-900 sm:text-4xl">
+            찾아주는 서비스와 진단해주는 서비스는 다릅니다
+          </h2>
+          <div className="mt-10 grid gap-4 sm:grid-cols-3">
+            {DIFFERENTIATION.map((d) => (
+              <div
+                key={d.title}
+                className={`rounded-2xl p-6 ${
+                  d.highlight
+                    ? 'border-2 border-teal bg-white shadow-[0_8px_30px_rgba(0,212,170,0.12)]'
+                    : 'border border-neutral-200 bg-white'
+                }`}
+              >
+                <p className={`text-base font-bold ${d.highlight ? 'text-teal-dark' : 'text-navy-900'}`}>
+                  {d.title}
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-neutral-500">{d.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 리포트 쇼케이스 */}
+      <section className="mx-auto max-w-4xl px-6 py-24">
+        <p className="eyebrow text-teal-dark">REPORT</p>
+        <h2 className="mt-3 text-3xl font-extrabold text-navy-900 sm:text-4xl">
+          말이 아니라, 리포트로 보여드립니다
+        </h2>
+        <p className="mt-4 max-w-2xl text-base text-neutral-500 sm:text-lg">
+          입력은 최소한으로, 결과는 근거와 함께. 아래는 실제 화면 구조를 그대로 반영한 예시입니다.
+        </p>
+        <ReportShowcase />
+      </section>
+
+      {/* 맞음/안 맞음 */}
+      <section className="bg-neutral-50 py-24">
+        <div className="mx-auto max-w-4xl px-6">
+          <h2 className="text-3xl font-extrabold text-navy-900 sm:text-4xl">
+            솔직하게 말씀드리면, 모두에게 맞는 서비스는 아닙니다
+          </h2>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-2xl border-2 border-green-200 bg-white p-6">
+              <p className="text-base font-bold text-green-800">이런 분께 맞습니다</p>
+              <ul className="mt-4 space-y-3">
+                {FIT.good.map((line) => (
+                  <li key={line} className="flex gap-2.5 text-sm text-neutral-600 sm:text-base">
+                    <span className="font-bold text-green-600" aria-hidden>✓</span>
+                    <span>{line}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-2xl border-2 border-red-100 bg-white p-6">
+              <p className="text-base font-bold text-red-700">이런 경우엔 맞지 않을 수 있습니다</p>
+              <ul className="mt-4 space-y-3">
+                {FIT.bad.map((line) => (
+                  <li key={line} className="flex gap-2.5 text-sm text-neutral-600 sm:text-base">
+                    <span className="font-bold text-red-400" aria-hidden>✕</span>
+                    <span>{line}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </section>
@@ -277,6 +407,23 @@ export default async function LandingPage() {
             </div>
           )}
         </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="mx-auto max-w-4xl px-6 py-24">
+        <p className="eyebrow text-teal-dark">FAQ</p>
+        <h2 className="mt-3 text-3xl font-extrabold text-navy-900 sm:text-4xl">자주 묻는 질문</h2>
+        <ul className="mt-8 space-y-4">
+          {LANDING_FAQS.map((item) => (
+            <li key={item.q} className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+              <p className="text-base font-bold text-navy-900">{item.q}</p>
+              <p className="mt-2 text-sm leading-relaxed text-neutral-600">{item.a}</p>
+            </li>
+          ))}
+        </ul>
+        <Link href="/faq" className="mt-6 inline-block text-sm font-semibold text-teal-dark hover:underline">
+          더 많은 질문 보기 →
+        </Link>
       </section>
 
       {/* 클로징 */}

@@ -22,6 +22,7 @@ interface MatchRow {
 }
 
 interface DiagnosisRow {
+  grant_listing_id: string | null
   relevance_score: number
   concreteness_score: number
   differentiation_score: number
@@ -51,7 +52,9 @@ export function ResultsView({
 }) {
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState('')
-  const topMatchTitle = matches.find((m) => m.prep_priority === 1)?.grant_listings?.title ?? null
+  const diagnosedMatch = diagnosis
+    ? matches.find((m) => m.grant_listing_id === diagnosis.grant_listing_id)
+    : undefined
 
   const handleRerun = () => {
     setError('')
@@ -109,6 +112,7 @@ export function ResultsView({
         <ul className="mt-4 space-y-4">
           {matches.map((m) => {
             const isTop = m.prep_priority === 1
+            const hasDiagnosis = diagnosedMatch?.id === m.id
             return (
               <li
                 key={m.id}
@@ -126,7 +130,7 @@ export function ResultsView({
                   >
                     {m.prep_priority}순위
                   </span>
-                  {isTop && (
+                  {hasDiagnosis && (
                     <span className="rounded-full bg-teal-tint px-2.5 py-1 text-xs font-bold text-teal-dark">
                       미니 4축 진단 포함
                     </span>
@@ -172,7 +176,7 @@ export function ResultsView({
         <section>
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
             <h2 className="text-base font-bold text-neutral-500">
-              1순위{topMatchTitle ? ` · ${topMatchTitle}` : ''} 미니 4축 예비진단
+              {diagnosedMatch ? `${diagnosedMatch.prep_priority}순위 · ${diagnosedMatch.grant_listings?.title ?? ''} ` : ''}미니 4축 예비진단
             </h2>
             <p className="text-xs text-neutral-400">{formatDateTime(diagnosis.created_at)} 기준</p>
           </div>
