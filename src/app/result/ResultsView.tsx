@@ -40,6 +40,13 @@ const VERDICT_STYLE: Record<Verdict, string> = {
   비추천: 'bg-neutral-100 text-neutral-600',
 }
 
+const VERDICT_ACCENT: Record<Verdict, string> = {
+  추천: 'border-l-green-400',
+  조건부: 'border-l-yellow-400',
+  '확인 필요': 'border-l-blue-400',
+  비추천: 'border-l-neutral-300',
+}
+
 export function ResultsView({
   matches,
   diagnosis,
@@ -107,7 +114,10 @@ export function ResultsView({
         )}
         <ul className="mt-4 space-y-4">
           {matches.map((m) => (
-            <li key={m.id} className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <li
+              key={m.id}
+              className={`rounded-xl border border-neutral-200 border-l-4 bg-white p-5 shadow-[0_8px_24px_rgba(10,19,48,0.05)] ${VERDICT_ACCENT[m.verdict]}`}
+            >
               <div className="flex items-start justify-between gap-2">
                 <h3 className="text-lg font-bold text-navy-900">{m.grant_listings?.title ?? '공고'}</h3>
                 <div className="flex shrink-0 items-center gap-2">
@@ -158,7 +168,7 @@ export function ResultsView({
             입력하신 요약 정보를 기준으로 낸 약식 진단이에요. 실제 사업계획서를 바탕으로 한 상세 진단은
             아니니, 점수보다 아래 요약과 위험 문장 코멘트를 참고용으로 봐주세요.
           </p>
-          <div className="mt-4 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+          <div className="mt-4 rounded-xl border-2 border-teal bg-white p-6 shadow-[0_8px_30px_rgba(0,212,170,0.1)]">
             <p className="text-4xl font-extrabold text-navy-900">{diagnosis.total_score} <span className="text-xl text-neutral-400">/ 100</span></p>
             <dl className="mt-5 grid grid-cols-1 gap-5 text-base sm:grid-cols-2">
               <Score label="관련성" value={diagnosis.relevance_score} reason={diagnosis.axis_reasons?.relevance} />

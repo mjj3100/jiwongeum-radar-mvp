@@ -1,3 +1,4 @@
+import { createClient } from '@/lib/supabase/server'
 import { AppShell } from '@/components/AppShell'
 
 const FAQS = [
@@ -19,13 +20,20 @@ const FAQS = [
   },
 ]
 
-export default function FaqPage() {
+export default async function FaqPage() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
   return (
-    <AppShell>
+    <AppShell userEmail={user?.email}>
       <div className="mx-auto max-w-2xl">
-        <p className="eyebrow text-teal-dark">FAQ</p>
-        <h1 className="mt-2 text-2xl font-extrabold text-navy-900">자주 묻는 질문</h1>
-        <ul className="mt-8 space-y-6">
+        <div className="rounded-2xl border border-teal-dark/15 bg-teal-tint/60 p-6 sm:p-8">
+          <p className="eyebrow text-teal-dark">FAQ</p>
+          <h1 className="mt-2 text-2xl font-extrabold text-navy-900">자주 묻는 질문</h1>
+        </div>
+        <ul className="mt-6 space-y-6">
           {FAQS.map((item) => (
             <li key={item.q} className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
               <p className="text-base font-bold text-navy-900">{item.q}</p>

@@ -37,7 +37,7 @@ export default async function DashboardPage() {
 
   if (!isActive) {
     return (
-      <AppShell isAdmin={isAdmin}>
+      <AppShell isAdmin={isAdmin} userEmail={user.email}>
         <div className="mx-auto max-w-lg text-center">
           <h1 className="text-2xl font-extrabold text-navy-900">Starter 구독이 필요합니다</h1>
           <p className="mt-3 text-base text-neutral-600">
@@ -64,7 +64,7 @@ export default async function DashboardPage() {
 
   if (!businessProfile) {
     return (
-      <AppShell isAdmin={isAdmin}>
+      <AppShell isAdmin={isAdmin} userEmail={user.email}>
         <div className="mx-auto max-w-lg text-center">
           <p className="text-base text-neutral-600">사업 정보를 먼저 입력해야 맞춤 공고를 볼 수 있어요.</p>
           <Link href="/result" className="btn-primary mt-6 inline-block">
@@ -85,10 +85,10 @@ export default async function DashboardPage() {
   ])
 
   return (
-    <AppShell isAdmin={isAdmin}>
-      <p className="mx-auto mb-6 max-w-2xl text-sm font-semibold text-teal-dark">
+    <AppShell isAdmin={isAdmin} userEmail={user.email}>
+      <div className="mx-auto mb-8 max-w-2xl rounded-xl border border-teal-dark/20 bg-teal-tint/60 px-5 py-4 text-sm font-semibold text-teal-dark">
         Starter 구독 만료일: {new Date(starter!.expires_at!).toLocaleDateString('ko-KR')}
-      </p>
+      </div>
       <ResultsView matches={matches ?? []} diagnosis={diagnoses?.[0] ?? null} canRerun />
     </AppShell>
   )

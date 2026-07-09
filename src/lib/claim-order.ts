@@ -1,5 +1,6 @@
 import 'server-only'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { track } from '@vercel/analytics/server'
 
 export type ClaimResult = 'approved' | 'order_used' | 'no_account' | 'no_order'
 
@@ -28,6 +29,7 @@ export async function claimOrder(
 
   if (result === 'approved') {
     await admin.from('profiles').update({ pending_order_no: null }).eq('email', email)
+    await track('claim_approved').catch(() => {})
   } else if (result === 'no_order') {
     await admin.from('profiles').update({ pending_order_no: orderNo }).eq('email', email)
   }

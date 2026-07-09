@@ -105,7 +105,7 @@
 
 ### Phase 10 — 법적 필수 (보고서 부록 A-1, 실고객 첫 결제 전 필수)
 - [x] 개인정보처리방침 페이지 (`/privacy`) — 수집항목·목적·보유기간·Anthropic 전송 고지·삭제요청·만 14세 미만 수집 금지 포함. 사업자정보는 통신판매업 신고 후 반영 예정으로 플레이스홀더 표시
-- [ ] 가입 폼에 개인정보처리방침 동의 체크박스 추가 (`/signup`) — 가입 플로우 변경이라 별도 승인 대기
+- [x] 가입 폼에 개인정보처리방침 동의 체크박스 추가 (`/signup`) — 클라이언트 required + 서버 액션 양쪽 검증
 - [x] 이용약관 페이지 (`/terms`) — 결제/환불/재진단/면책/준거법 조항 포함
 - [ ] 푸터에 사업자정보 표시 — **[사람, 통신판매업 신고 후]**. 그 전까지 `SiteFooter.tsx`는 정책 링크만 노출
 - [ ] **[사람]** 통신판매업 신고 — **MVP(29,900원 티어) 완성 후로 확정 연기**
@@ -125,12 +125,17 @@
   - [ ] 헤드라인 교체: "공고는 찾으셨죠. 그런데 공고문 앞에서 멈추셨죠."
 
 ### Phase 11 — 이탈 방지 UX·운영 (보고서 부록 A-2)
-- [ ] 운영자 주문 등록 시 이용권 활성화 알림 이메일 자동 발송 (`/admin/orders/actions.ts` createOrder 훅)
+- [ ] 운영자 주문 등록 시 이용권 활성화 알림 이메일 자동 발송 (`/admin/orders/actions.ts` createOrder 훅) — 이메일 발송 서비스(Resend 등) 계정·API 키 필요, 아직 없음
 - [x] 매칭 쿼리에 `apply_end >= 오늘` 필터 — `src/lib/grants/match.ts`의 `ruleBasedFilter`에 이미 있었음(확인 완료). 결과 카드에 D-day 표시(`DdayBadge`, `ResultsView.tsx`)만 신규 추가 — `/result`, `/dashboard` 양쪽 다 반영
 - [x] 진단 결과에 생성 일시 표기 — `diagnosis_reports.created_at`을 `ResultsView`에 "OO 기준"으로 표시. 데이터 기준일(공고 fetched_at) 표기는 미포함, 필요시 후속 작업
 - [x] 모바일 레이아웃 점검 — 임시 프리뷰 라우트로 `/result` 목업 데이터 렌더링해 375px 확인, 헤더 버튼 줄바꿈 깨짐 발견해 수정(`flex-col sm:flex-row`). `/signup`, `/faq`, `/terms`, 랜딩도 375px에서 확인 완료. `/admin/orders`, `/pending`은 로그인 필요해 코드 리뷰로만 확인(표는 이미 `overflow-x-auto` 처리됨)
-- [ ] Vercel Analytics 퍼널 이벤트 삽입: 랜딩→가격표→가입→클레임→진단완료
-- [ ] Sentry 무료 티어 연동
+- [x] Vercel Analytics 연동 — `@vercel/analytics` 설치(2.0.1), 루트 레이아웃에 `<Analytics />` 추가로 전 페이지 자동 pageview 수집. 서버 액션 `track()`으로 `claim_approved` 커스텀 이벤트 추가(`src/lib/claim-order.ts`). 랜딩→가격표→가입 단계는 pageview로 커버, 진단완료 이벤트는 아직 미추가
+- [ ] Sentry 무료 티어 연동 — `next.config.ts` 수정이 필요해 별도 승인 대기 중
+
+### Phase 11 — 발견된 버그·UX 보강 (2026-07-09 프로덕션 QA 중 발견)
+- [x] **[버그] 진단 결과 전체 누락** — `diagnosis_reports` insert 실패(당시 `axis_reasons` 컬럼 미존재)가 조용히 무시되어 매칭 후보는 나오는데 4축 진단 전체가 사라지는 문제. `runAnalysisForUser`의 insert 결과 에러를 항상 로그로 남기도록 수정(`analyze-service.ts`) — 향후 유사한 스키마 불일치를 서버 로그로 바로 알아챌 수 있음
+- [x] 로그인 사용자용 네비게이션 추가 — 헤더에 "내 결과"/"로그아웃" 링크 부재로 결과 화면 밖에서 돌아갈 방법이 없던 문제. `BrandHeader`/`AppShell`/랜딩 커스텀 nav에 로그인 상태 감지 추가, `src/lib/auth-actions.ts`에 `signOut` 신규. 별도 "마이페이지" 라우트 없이 `/result` 재방문으로 충분하다고 판단(진단 이력이 1건뿐이라 목록 UI는 불필요)
+- [x] 전체 디자인 시각 보강 — 결과/대시보드/관리자/약관/FAQ 등 AppShell 사용 페이지 전반이 랜딩 대비 밋밋하다는 피드백. `AppShell`에 `RadarGlow` 브랜드 장식 추가(7개 페이지 공통), 매칭 카드에 판정별 좌측 컬러 악센트, 진단 카드 teal 강조 테두리, 법적 페이지 섹션을 카드형으로 재구성 + 상단 tint 헤더 밴드 추가
 
 ## Phase 12 (보고서 §4 Phase 3) — 19,900 본진단 (3~4주, 최대 분량, ~8/15 목표)
 - [ ] 매칭 결과에서 공고 1건 선택하는 UI

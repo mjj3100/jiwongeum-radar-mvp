@@ -1,8 +1,10 @@
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/server'
 import { RadarLogo, RadarGlow } from '@/components/RadarLogo'
 import { HeroPreviewCard } from '@/components/HeroPreviewCard'
 import { SiteFooter } from '@/components/SiteFooter'
 import { PurchaseConsentGate } from '@/components/PurchaseConsentGate'
+import { signOut } from '@/lib/auth-actions'
 import { LITTLY_URL_BUNDLE, LITTLY_URL_STARTER, PRICING, SHOW_STARTER_ON_LANDING } from '@/lib/constants'
 
 const FRICTION_POINTS = [
@@ -57,7 +59,12 @@ const STEPS = [
   { n: '04', title: '맞춤 진단 받기', desc: '사업 정보만 입력하면 맞춤 공고 3~5개와 미니 4축 진단이 바로 나옵니다.' },
 ]
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
   return (
     <main>
       {/* HERO — 다크 네이비 + 레이더 글로우 */}
@@ -68,12 +75,31 @@ export default function LandingPage() {
             <RadarLogo size={28} />
             <span className="text-base font-bold text-white">지원금 레이더</span>
           </div>
-          <Link
-            href="/login"
-            className="rounded-md border border-white/20 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10"
-          >
-            로그인
-          </Link>
+          {user ? (
+            <div className="flex items-center gap-2">
+              <Link
+                href="/result"
+                className="rounded-md border border-white/20 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+              >
+                내 결과
+              </Link>
+              <form action={signOut}>
+                <button
+                  type="submit"
+                  className="rounded-md px-4 py-2 text-sm font-semibold text-lavender transition-colors hover:bg-white/10"
+                >
+                  로그아웃
+                </button>
+              </form>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="rounded-md border border-white/20 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+            >
+              로그인
+            </Link>
+          )}
         </nav>
         <div className="relative mx-auto grid max-w-6xl gap-10 px-6 pb-24 pt-12 lg:grid-cols-[1.3fr_0.7fr] lg:items-center lg:gap-12 lg:pb-32 lg:text-left">
           <div className="text-center lg:text-left">

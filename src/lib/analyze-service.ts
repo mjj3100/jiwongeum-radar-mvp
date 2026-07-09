@@ -75,7 +75,7 @@ export async function runAnalysisForUser(
   await admin.from('diagnosis_reports').delete().eq('user_id', userId)
 
   if (result.matches.length > 0) {
-    await admin.from('match_results').insert(
+    const { error: matchError } = await admin.from('match_results').insert(
       result.matches.map((m) => ({
         user_id: userId,
         grant_listing_id: m.grant_listing_id,
@@ -85,10 +85,13 @@ export async function runAnalysisForUser(
         prep_priority: m.prep_priority,
       }))
     )
+    // insert 실패를 조용히 넘기면 화면엔 "매칭 후보 0건"으로만 보여 원인을 알 수 없다.
+    // 서버 로그에는 반드시 남겨서 스키마 불일치 등을 바로 알아챌 수 있게 한다.
+    if (matchError) console.error('[runAnalysisForUser] match_results insert 실패:', matchError)
   }
 
   if (result.diagnosis) {
-    await admin.from('diagnosis_reports').insert({
+    const { error: diagnosisError } = await admin.from('diagnosis_reports').insert({
       user_id: userId,
       grant_listing_id: result.matches[0]?.grant_listing_id ?? null,
       relevance_score: result.diagnosis.relevance_score,
@@ -99,6 +102,7 @@ export async function runAnalysisForUser(
       risk_sentences: result.diagnosis.risk_sentences,
       summary: result.diagnosis.summary,
     })
+    if (diagnosisError) console.error('[runAnalysisForUser] diagnosis_reports insert 실패:', diagnosisError)
   }
 
   return { ok: true, result }

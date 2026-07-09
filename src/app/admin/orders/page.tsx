@@ -24,7 +24,7 @@ export default async function AdminOrdersPage() {
     .limit(20)
 
   return (
-    <AppShell isAdmin>
+    <AppShell isAdmin userEmail={user?.email}>
       <div className="mx-auto max-w-2xl space-y-10">
         <div>
           <p className="eyebrow text-teal-dark">ADMIN</p>

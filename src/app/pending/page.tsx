@@ -37,7 +37,7 @@ export default async function PendingPage() {
   }
 
   return (
-    <AppShell isAdmin={isAdminEmail(user.email)}>
+    <AppShell isAdmin={isAdminEmail(user.email)} userEmail={user.email}>
       <div className="mx-auto max-w-lg space-y-6 text-center">
         <h1 className="text-2xl font-extrabold text-navy-900">결제 확인 중이에요</h1>
         <p className="text-base text-neutral-600">

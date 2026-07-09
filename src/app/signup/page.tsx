@@ -51,6 +51,20 @@ export default function SignupPage() {
             className="input mt-1.5"
           />
         </div>
+        <label className="flex items-start gap-2.5 text-sm text-neutral-600">
+          <input
+            name="privacy_agree"
+            type="checkbox"
+            required
+            className="mt-0.5 h-4 w-4 shrink-0 rounded border-neutral-300 text-teal-dark focus:ring-teal"
+          />
+          <span>
+            <Link href="/privacy" target="_blank" className="font-semibold text-teal-dark underline">
+              개인정보처리방침
+            </Link>
+            에 동의합니다. (필수)
+          </span>
+        </label>
         {state.error && <p className="text-sm text-red-600">{state.error}</p>}
         <button type="submit" disabled={pending} className="btn-primary w-full disabled:opacity-50">
           {pending ? '확인 중...' : '가입하고 바로 시작하기'}

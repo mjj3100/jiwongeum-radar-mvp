@@ -1,13 +1,19 @@
+import { createClient } from '@/lib/supabase/server'
 import { AppShell } from '@/components/AppShell'
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
   return (
-    <AppShell>
-      <div className="mx-auto max-w-2xl space-y-10 text-neutral-700">
-        <div>
+    <AppShell userEmail={user?.email}>
+      <div className="mx-auto max-w-2xl space-y-6 text-neutral-700">
+        <div className="rounded-2xl border border-teal-dark/15 bg-teal-tint/60 p-6 sm:p-8">
           <p className="eyebrow text-teal-dark">TERMS</p>
           <h1 className="mt-2 text-2xl font-extrabold text-navy-900">이용약관</h1>
-          <p className="mt-2 text-sm text-neutral-400">시행일: [사업자 등록 완료 후 확정 예정]</p>
+          <p className="mt-2 text-sm text-neutral-500">시행일: [사업자 등록 완료 후 확정 예정]</p>
         </div>
 
         <Section title="제1조 (목적)">
@@ -68,7 +74,7 @@ export default function TermsPage() {
           <p>이 약관과 관련한 분쟁은 대한민국 법을 준거법으로 하며, 관할 법원은 관계 법령에 따릅니다.</p>
         </Section>
 
-        <p className="border-t border-neutral-200 pt-6 text-xs text-neutral-400">
+        <p className="rounded-lg bg-neutral-50 px-5 py-4 text-xs text-neutral-400">
           사업자정보(상호·대표자·사업자등록번호·통신판매업 신고번호)는 통신판매업 신고 완료 후 이
           문서에 반영됩니다.
         </p>
@@ -79,7 +85,7 @@ export default function TermsPage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section>
+    <section className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
       <h2 className="text-base font-bold text-navy-900">{title}</h2>
       <div className="mt-2 text-sm leading-relaxed">{children}</div>
     </section>

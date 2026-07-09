@@ -60,7 +60,7 @@ export default async function ResultPage({
 
   if (!businessProfile || edit === '1') {
     return (
-      <AppShell isAdmin={isAdmin}>
+      <AppShell isAdmin={isAdmin} userEmail={user.email}>
         <BusinessProfileForm defaultValues={businessProfile as BusinessProfileInput | undefined} />
       </AppShell>
     )
@@ -76,7 +76,7 @@ export default async function ResultPage({
   ])
 
   return (
-    <AppShell isAdmin={isAdmin}>
+    <AppShell isAdmin={isAdmin} userEmail={user.email}>
       <ResultsView
         matches={matches ?? []}
         diagnosis={diagnoses?.[0] ?? null}
