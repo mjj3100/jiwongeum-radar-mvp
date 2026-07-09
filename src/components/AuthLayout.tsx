@@ -1,4 +1,5 @@
 import { RadarLogo, RadarGlow } from './RadarLogo'
+import { SiteFooter } from './SiteFooter'
 
 const TRUST_POINTS = [
   '맞춤 지원사업 후보 3~5개 진단',
@@ -40,8 +41,11 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* 우측 폼 패널 */}
-      <div className="flex flex-1 items-center justify-center bg-neutral-50 px-6 py-16">
-        <div className="w-full max-w-sm">{children}</div>
+      <div className="flex flex-1 flex-col bg-neutral-50">
+        <div className="flex flex-1 items-center justify-center px-6 py-16">
+          <div className="w-full max-w-sm">{children}</div>
+        </div>
+        <SiteFooter />
       </div>
     </div>
   )
