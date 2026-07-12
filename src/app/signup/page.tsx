@@ -65,6 +65,18 @@ export default function SignupPage() {
             에 동의합니다. (필수)
           </span>
         </label>
+        <label className="flex items-start gap-2.5 text-sm text-neutral-600">
+          <input
+            name="refund_agree"
+            type="checkbox"
+            required
+            className="mt-0.5 h-4 w-4 shrink-0 rounded border-neutral-300 text-teal-dark focus:ring-teal"
+          />
+          <span>
+            진단 결과 발급 후에는 환불이 제한되며, 재진단은 결제한 상품의 규칙(동일 공고·마감일 한정)을
+            따른다는 점에 동의합니다. (필수)
+          </span>
+        </label>
         {state.error && <p className="text-sm text-red-600">{state.error}</p>}
         <button type="submit" disabled={pending} className="btn-primary w-full disabled:opacity-50">
           {pending ? '확인 중...' : '가입하고 바로 시작하기'}

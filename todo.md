@@ -69,7 +69,7 @@
 - [x] Vercel 환경변수 등록 완료 (Supabase 3종, Anthropic, 리틀리 2종, K-Startup, 기업마당, CRON_SECRET — 총 9개)
 - [x] **GitHub 저장소를 Public으로 전환** — Vercel이 이 계정에서 개인 스코프를 지원하지 않아("personal_scope_not_allowed") 팀 멤버십 문제로 배포가 막혔던 것을 해결. 비밀키는 `.env.local`이라 git에 없어 노출 없음. Pro 업그레이드(유료) 대신 이 방법으로 무료 해결
 - [x] **키 회전**(service_role, Anthropic) — 재발급 + Vercel 프로덕션 환경변수 반영 완료
-- [ ] Supabase Site URL = `https://jiwongeum-radar-mvp.vercel.app`
+- [x] Supabase Site URL = `https://jiwongeum-radar-mvp.vercel.app` — 확인 완료
 
 ## Phase 9 — 실결제 검수 ✅ AI 분석 직전까지 통과
 - [x] 실제 결제 1건 → 진짜 주문번호로 가입→승인까지 확인 (AI 분석 단계는 크레딧 문제로 대기)
@@ -101,7 +101,7 @@
 - [ ] 리틀리 상품 5종 실제 등록 + 각 상품 결제완료 화면에 카카오 알림톡 주문번호 안내 문구 연결 — **[사람, MVP(29,900원 티어) 완성 후로 확정 연기]**
 - [x] 결제 전 고지 UI: 환불 불가(발급 후)·재진단 규칙을 랜딩 결제 CTA에 동의 체크박스로 게이팅 (`PurchaseConsentGate.tsx`, 미동의 시 결제 링크 비활성)
 - [x] **[사람]** 서비스 키 회전 — `service_role`, Anthropic API 키 재발급 + Vercel 프로덕션 환경변수 반영 완료
-- [ ] **[사람]** Supabase Site URL 프로덕션 값 반영
+- [x] **[사람]** Supabase Site URL 프로덕션 값 반영 — 확인 완료
 
 ### Phase 10 — 법적 필수 (보고서 부록 A-1, 실고객 첫 결제 전 필수)
 - [x] 개인정보처리방침 페이지 (`/privacy`) — 수집항목·목적·보유기간·Anthropic 전송 고지·삭제요청·만 14세 미만 수집 금지 포함. 사업자정보는 통신판매업 신고 후 반영 예정으로 플레이스홀더 표시
@@ -110,7 +110,7 @@
 - [ ] 푸터에 사업자정보 표시 — **[사람, 통신판매업 신고 후]**. 그 전까지 `SiteFooter.tsx`는 정책 링크만 노출
 - [ ] **[사람]** 통신판매업 신고 — **판매 건수 10건 초과 시 진행** (그 전까지는 리스크 감수하고 보류하기로 결정. 리틀리를 결제 창구로 쓴다고 이 의무가 면제되는 건 아님 — 소비자에게 판매자 신원을 표시해야 하는 요건이라 결제 도구와는 별개)
 - [ ] **[사람]** 실제 마케팅 랜딩(`jiwongeum-radar-landing-deploy.vercel.app`, 오픈클로 봇으로 별도 제작·이 저장소 밖에 있음)도 사업자정보 미표시 — 위와 동일하게 판매 10건 초과 시 함께 반영
-- [ ] 청약철회 제한 고지 + 결제 전 동의 체크 UI — 랜딩 CTA는 완료(위 항목), `/signup` 단계 동의는 별도 승인 대기
+- [x] 청약철회 제한 고지 + 결제 전 동의 체크 UI — 랜딩 CTA(`PurchaseConsentGate.tsx`)에 이어 `/signup`에도 동일 문구의 `refund_agree` 체크박스 추가, 클라이언트 required + 서버 액션(`signup/actions.ts`) 양쪽 검증
 - [x] 진단 결과 화면 하단 면책 문구 — 기존 `ResultsView.tsx`에 이미 존재("이 결과는 제출 준비도를 점검하는 참고 자료이며, 합격이나 선정을 보장하지 않습니다") 확인 완료, 추가 작업 불필요
 - [x] FAQ 4문항 페이지 (`/faq`) — 환불/재진단 규칙/HWP 안내/진단 소요시간. CS 채널(오픈카톡) 링크는 `SiteFooter.tsx`에 준비중 표시로 노출(실제 링크는 사람이 채워야 함)
 

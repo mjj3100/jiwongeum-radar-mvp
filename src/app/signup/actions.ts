@@ -11,6 +11,7 @@ export async function signup(formData: FormData): Promise<{ error: string } | ne
   const password = String(formData.get('password') || '')
   const orderNoRaw = String(formData.get('order_no') || '')
   const privacyAgree = formData.get('privacy_agree') === 'on'
+  const refundAgree = formData.get('refund_agree') === 'on'
 
   if (!email || !password) {
     return { error: '이메일과 비밀번호를 입력해주세요.' }
@@ -18,6 +19,10 @@ export async function signup(formData: FormData): Promise<{ error: string } | ne
 
   if (!privacyAgree) {
     return { error: '개인정보처리방침에 동의해야 가입할 수 있습니다.' }
+  }
+
+  if (!refundAgree) {
+    return { error: '환불·재진단 규칙에 동의해야 가입할 수 있습니다.' }
   }
 
   if (!isValidOrderNo(orderNoRaw)) {
