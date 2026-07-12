@@ -68,7 +68,7 @@
 - [x] **Vercel 배포 완료** — https://jiwongeum-radar-mvp.vercel.app (프로덕션 E2E 재검증 완료, grant sync까지 확인)
 - [x] Vercel 환경변수 등록 완료 (Supabase 3종, Anthropic, 리틀리 2종, K-Startup, 기업마당, CRON_SECRET — 총 9개)
 - [x] **GitHub 저장소를 Public으로 전환** — Vercel이 이 계정에서 개인 스코프를 지원하지 않아("personal_scope_not_allowed") 팀 멤버십 문제로 배포가 막혔던 것을 해결. 비밀키는 `.env.local`이라 git에 없어 노출 없음. Pro 업그레이드(유료) 대신 이 방법으로 무료 해결
-- [ ] **키 회전**(service_role, Anthropic) — 로컬 개발 중 사용한 키는 실제 고객 받기 전 재발급 권장
+- [x] **키 회전**(service_role, Anthropic) — 재발급 + Vercel 프로덕션 환경변수 반영 완료
 - [ ] Supabase Site URL = `https://jiwongeum-radar-mvp.vercel.app`
 
 ## Phase 9 — 실결제 검수 ✅ AI 분석 직전까지 통과
@@ -100,7 +100,7 @@
 - [ ] `/admin/orders` `CreateOrderForm.tsx`: `product` select를 5종으로 확장 (`bundle`(구) 옵션은 과거 데이터 조회용으로만 유지할지 결정)
 - [ ] 리틀리 상품 5종 실제 등록 + 각 상품 결제완료 화면에 카카오 알림톡 주문번호 안내 문구 연결 — **[사람, MVP(29,900원 티어) 완성 후로 확정 연기]**
 - [x] 결제 전 고지 UI: 환불 불가(발급 후)·재진단 규칙을 랜딩 결제 CTA에 동의 체크박스로 게이팅 (`PurchaseConsentGate.tsx`, 미동의 시 결제 링크 비활성)
-- [ ] **[사람]** 서비스 키 회전 — `service_role`, Anthropic API 키 재발급 (CHANGES_FROM_PLAN.md §14, 실고객 전 필수)
+- [x] **[사람]** 서비스 키 회전 — `service_role`, Anthropic API 키 재발급 + Vercel 프로덕션 환경변수 반영 완료
 - [ ] **[사람]** Supabase Site URL 프로덕션 값 반영
 
 ### Phase 10 — 법적 필수 (보고서 부록 A-1, 실고객 첫 결제 전 필수)
