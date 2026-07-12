@@ -94,13 +94,20 @@
 > 시즌 데드라인: **~8/15까지 Phase 10+11 완료 = "팔리는 상태"**, 8~9월 소시즌 진입.
 
 ## Phase 10 (보고서 §1, §4 Phase 1) — 상품·결제 뼈대 (목표 1주, ~7/16)
-- [ ] `src/lib/constants.ts`: `PRICING`을 3티어로 재정의 — `radar_check`(9,900), `fit_diagnosis`(19,900), `submission_rehearsal`(29,900). 각 `features` 배열을 보고서 §1-1 표의 산출물로 채움
+> **명칭 확정 변경**: 보고서의 `radar_check`/`fit_diagnosis`/`submission_rehearsal`은 실제
+> 마케팅 랜딩(`jiwongeum-radar-landing-deploy`)에서 이미 SCAN/LOCK-ON/FULL RADAR로 브랜딩·
+> 판매 중이라 이 이름으로 통일했다. 구독형 `starter`는 리틀리가 정기결제를 지원하지 않아
+> 폐기 확정(코드 완전 삭제 완료).
+- [x] `src/lib/constants.ts`: `PRICING`을 `scan`(9,900원, 실제 판매가 확정)으로 갱신, `bundle`/`starter` 완전 삭제. `lockon`/`fullradar`는 실제 판매 시작 시 추가 예정
 - [ ] 업그레이드 상품 2종 정의 — 9,900→19,900(10,000원), 19,900→29,900(10,000원)
-- [ ] DB 마이그레이션 신규(0007): `orders`/`entitlements`의 `product` CHECK 제약을 5종(`bundle`→3티어명 + 업그레이드 2종, 또는 기존 `bundle`을 `radar_check`로 리네이밍)으로 확장. 기존 `bundle`/`starter` 데이터 마이그레이션 방법 결정 필요
+- [x] DB 마이그레이션 0009: `orders`/`entitlements`의 `product` 값을 `bundle`→`scan`으로 데이터 마이그레이션 후 CHECK 제약을 `scan` 단일값으로 축소(starter 완전 제거). lockon/fullradar는 실제 판매 시작 시 별도 마이그레이션
 - [ ] `claim_order` RPC v3: 업그레이드 주문 클레임 시 하위 티어 이용권 보유 여부 검증(없으면 거부), 보유 시 상위 티어 이용권 부여
-- [ ] `/admin/orders` `CreateOrderForm.tsx`: `product` select를 5종으로 확장 (`bundle`(구) 옵션은 과거 데이터 조회용으로만 유지할지 결정)
+- [x] `/admin/orders` `CreateOrderForm.tsx`: `product` select를 `scan` 단일 옵션으로 갱신 (5종 확장은 lockon/fullradar 실제 판매 시작 시)
 - [ ] 리틀리 상품 5종 실제 등록 + 각 상품 결제완료 화면에 카카오 알림톡 주문번호 안내 문구 연결 — **[사람, MVP(29,900원 티어) 완성 후로 확정 연기]**
 - [x] 결제 전 고지 UI: 환불 불가(발급 후)·재진단 규칙을 랜딩 결제 CTA에 동의 체크박스로 게이팅 (`PurchaseConsentGate.tsx`, 미동의 시 결제 링크 비활성)
+- [x] **SCAN 재진단 3회 캡**: 정보 수정을 통한 재진단에 횟수 제한이 없어 한 번 결제로 무제한 재분석(비용 초과 리스크)이 가능했던 문제 발견·수정. `business_profiles.analysis_count`로 첫 진단 포함 총 3회까지만 허용, 초과 시 Claude 호출 전에 차단 + LOCK-ON 안내(`analyze-service.ts`, `ResultsView.tsx`)
+- [x] **낮은 점수 헤드라인 완화**: 4축 총점 50점 미만이면 종합판정 헤드라인 톤을 낮춤(예: 타지역 이전 필요한 40점 공고를 "접수 가능"으로 낙관적으로 포장하던 문제 수정)
+- [x] **Starter(월구독) 완전 삭제**: `/dashboard` 페이지, `SHOW_STARTER_ON_LANDING`, `LITTLY_URL_STARTER`, 구독 연장 로직 등 전부 제거 (실보유자 0명 확인 후 진행)
 - [x] **[사람]** 서비스 키 회전 — `service_role`, Anthropic API 키 재발급 + Vercel 프로덕션 환경변수 반영 완료
 - [x] **[사람]** Supabase Site URL 프로덕션 값 반영 — 확인 완료
 
