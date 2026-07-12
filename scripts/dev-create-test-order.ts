@@ -3,18 +3,18 @@
  * 실제로는 운영자가 리틀리 결제 확인 후 이 작업을 수동으로 한다 (spec.md §3-7).
  *
  * 사용법:
- *   npx tsx --env-file=.env.local scripts/dev-create-test-order.ts <16자리주문번호> <bundle|starter>
+ *   npx tsx --env-file=.env.local scripts/dev-create-test-order.ts <16자리주문번호> scan
  */
 import { createClient } from '@supabase/supabase-js'
 
 const [, , orderNo, product] = process.argv
 
 if (!orderNo || !/^\d{16}$/.test(orderNo)) {
-  console.error('사용법: npx tsx --env-file=.env.local scripts/dev-create-test-order.ts <16자리숫자> <bundle|starter>')
+  console.error('사용법: npx tsx --env-file=.env.local scripts/dev-create-test-order.ts <16자리숫자> scan')
   process.exit(1)
 }
-if (product !== 'bundle' && product !== 'starter') {
-  console.error('product는 bundle 또는 starter여야 합니다.')
+if (product !== 'scan') {
+  console.error('product는 scan이어야 합니다.')
   process.exit(1)
 }
 

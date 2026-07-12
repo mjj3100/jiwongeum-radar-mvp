@@ -30,9 +30,8 @@ export function CreateOrderForm() {
         <label htmlFor="product" className="block text-sm font-semibold text-navy-900">
           상품
         </label>
-        <select id="product" name="product" required defaultValue="bundle" className="input mt-1.5">
-          <option value="bundle">bundle (전자책+진단리포트)</option>
-          <option value="starter">starter (월구독)</option>
+        <select id="product" name="product" required defaultValue="scan" className="input mt-1.5">
+          <option value="scan">scan (SCAN 9,900원)</option>
         </select>
       </div>
       {state.error && <p className="text-sm text-red-600">{state.error}</p>}

@@ -1,8 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { rerunAnalysis } from './actions'
 import { RadarLogo, RadarGlow } from '@/components/RadarLogo'
 import type { AxisReasons, BusinessProfileInput, EligibilityCheck, EligibilityStatus, RiskSentence, Verdict } from '@/lib/types'
 
@@ -53,30 +51,23 @@ const ELIG_MARK: Record<EligibilityStatus, { symbol: string; className: string }
   미충족: { symbol: '✗', className: 'text-report-danger' },
 }
 
+// SCAN은 첫 진단 포함 총 3회까지 재분석 가능 (src/lib/analyze-service.ts의 MAX_ANALYSIS_COUNT와 동일)
+const MAX_ANALYSIS_COUNT = 3
+
 export function ResultsView({
   matches,
   diagnosis,
-  canRerun,
+  analysisCount,
   businessProfile,
 }: {
   matches: MatchRow[]
   diagnosis: DiagnosisRow | null
-  canRerun: boolean
+  analysisCount: number
   businessProfile: BusinessProfileInput & { updated_at: string }
 }) {
-  const [pending, startTransition] = useTransition()
-  const [error, setError] = useState('')
   const diagnosedMatch = diagnosis
     ? matches.find((m) => m.grant_listing_id === diagnosis.grant_listing_id)
     : undefined
-
-  const handleRerun = () => {
-    setError('')
-    startTransition(async () => {
-      const result = await rerunAnalysis()
-      if (result?.error) setError(result.error)
-    })
-  }
 
   const founderLabel = `${businessProfile.founder_status}${
     businessProfile.age_group ? ` (${businessProfile.age_group})` : ''
@@ -84,28 +75,24 @@ export function ResultsView({
   const issueDate = diagnosis?.created_at ?? businessProfile.updated_at
   const issueDateLabel = formatDate(issueDate)
   const reportNo = diagnosis ? buildReportNo(diagnosis) : null
-  const headline = buildHeadline(matches)
+  const headline = buildHeadline(matches, diagnosis)
+  const remaining = Math.max(0, MAX_ANALYSIS_COUNT - analysisCount)
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div className="flex flex-wrap items-center justify-end gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-xs text-neutral-400">
+          {remaining > 0
+            ? `재진단 ${remaining}회 남음 (총 ${MAX_ANALYSIS_COUNT}회 중 ${analysisCount}회 사용)`
+            : '재진단 소진 — 더 정밀한 진단은 출시 예정인 LOCK-ON(19,900원)에서 만나요'}
+        </p>
         <Link
           href="/result?edit=1"
           className="whitespace-nowrap rounded-md border border-navy-900/15 px-4 py-2 text-sm font-semibold text-navy-900 hover:bg-navy-900/5"
         >
           정보 수정하기
         </Link>
-        {canRerun && (
-          <button
-            onClick={handleRerun}
-            disabled={pending}
-            className="whitespace-nowrap rounded-md border border-teal-dark/40 px-4 py-2 text-sm font-semibold text-teal-dark hover:bg-teal-tint disabled:opacity-50"
-          >
-            {pending ? '다시 분석 중...' : '다시 진단받기'}
-          </button>
-        )}
       </div>
-      {error && <p className="text-base text-red-600">{error}</p>}
 
       <div className="overflow-hidden rounded-2xl border border-navy-900/10 shadow-[0_20px_60px_rgba(10,19,48,0.12)]">
         {/* ── 리포트 헤더 (navy) ───────────── */}
@@ -343,9 +330,15 @@ function truncate(text: string, maxLen: number): string {
   return clean.length > maxLen ? `${clean.slice(0, maxLen)}…` : clean
 }
 
-function buildHeadline(matches: MatchRow[]): string {
+function buildHeadline(matches: MatchRow[], diagnosis: DiagnosisRow | null): string {
   if (matches.length === 0) {
     return '지금은 뚜렷하게 맞는 공고를 찾지 못했어요'
+  }
+  // 후보는 있지만 4축 총점이 낮으면(예: 타지역 이전이 필요한 공고가 최선인 경우) "접수
+  // 가능한 공고가 탐지됐다"는 낙관적인 문구 대신 톤을 낮춘다. 공고는 매일 갱신되니
+  // 며칠 뒤 다시 확인하라는 안내로 재진단 3회를 자연스럽게 쓰도록 유도한다.
+  if (diagnosis && diagnosis.total_score < 50) {
+    return '지금 후보들은 전반적으로 적합도가 낮아요. 아래는 참고만 하시고, 공고는 매일 업데이트되니 며칠 뒤 다시 확인해보세요.'
   }
   const goodCount = matches.filter((m) => m.verdict === '추천' || m.verdict === '조건부').length
   if (goodCount > 0) {

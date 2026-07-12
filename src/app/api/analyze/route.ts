@@ -2,7 +2,12 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { runAnalysisForUser } from '@/lib/analyze-service'
 
-const STATUS_BY_ERROR = { no_entitlement: 403, no_business_profile: 400, analysis_failed: 502 } as const
+const STATUS_BY_ERROR = {
+  no_entitlement: 403,
+  no_business_profile: 400,
+  analysis_failed: 502,
+  analysis_limit_reached: 403,
+} as const
 
 export async function POST() {
   const supabase = await createClient()

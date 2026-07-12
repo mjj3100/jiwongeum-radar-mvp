@@ -6,7 +6,7 @@ import { ReportShowcase } from '@/components/ReportShowcase'
 import { SiteFooter } from '@/components/SiteFooter'
 import { PurchaseConsentGate } from '@/components/PurchaseConsentGate'
 import { signOut } from '@/lib/auth-actions'
-import { LITTLY_URL_BUNDLE, LITTLY_URL_STARTER, PRICING, SHOW_STARTER_ON_LANDING } from '@/lib/constants'
+import { LITTLY_URL_SCAN, PRICING } from '@/lib/constants'
 
 const FRICTION_POINTS = [
   '이 공고, 내가 신청 가능한가? 자격 해석이 어렵다',
@@ -149,7 +149,7 @@ export default async function LandingPage() {
             </p>
 
             <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-start">
-              <a href={LITTLY_URL_BUNDLE} className="btn-primary w-full text-base sm:w-auto">
+              <a href={LITTLY_URL_SCAN} className="btn-primary w-full text-base sm:w-auto">
                 맞춤 진단 리포트 받기
               </a>
               <Link
@@ -371,12 +371,12 @@ export default async function LandingPage() {
       <section className="mx-auto max-w-4xl px-6 py-24">
         <p className="eyebrow text-teal-dark">PRICING</p>
         <h2 className="mt-3 text-3xl font-extrabold text-navy-900 sm:text-4xl">이용 방법</h2>
-        <div className={`mt-10 grid gap-6 ${SHOW_STARTER_ON_LANDING ? 'sm:grid-cols-2' : 'mx-auto max-w-md'}`}>
+        <div className="mx-auto mt-10 max-w-md">
           <div className="rounded-2xl border-2 border-teal bg-white p-8 shadow-[0_8px_30px_rgba(0,212,170,0.12)]">
-            <p className="eyebrow text-teal-dark">{PRICING.bundle.name}</p>
-            <p className="mt-3 text-sm text-neutral-500">1회 결제 · 즉시 진단</p>
+            <p className="eyebrow text-teal-dark">{PRICING.scan.name}</p>
+            <p className="mt-3 text-sm text-neutral-500">1회 결제 · 즉시 진단 · {PRICING.scan.price.toLocaleString()}원</p>
             <ul className="mt-6 space-y-2.5 text-base text-neutral-700">
-              {PRICING.bundle.features.map((f) => (
+              {PRICING.scan.features.map((f) => (
                 <li key={f} className="flex gap-2.5">
                   <span className="font-bold text-teal-dark">✓</span>
                   {f}
@@ -384,28 +384,9 @@ export default async function LandingPage() {
               ))}
             </ul>
             <div className="mt-8">
-              <PurchaseConsentGate href={LITTLY_URL_BUNDLE} label="결제하고 시작하기" />
+              <PurchaseConsentGate href={LITTLY_URL_SCAN} label="결제하고 시작하기" />
             </div>
           </div>
-          {SHOW_STARTER_ON_LANDING && (
-            <div className="rounded-2xl border border-navy-900/10 bg-white p-8">
-              <p className="eyebrow text-teal-dark">{PRICING.starter.name}</p>
-              <p className="mt-3 text-sm text-neutral-500">
-                월 {PRICING.starter.price.toLocaleString()}원
-              </p>
-              <ul className="mt-6 space-y-2.5 text-base text-neutral-700">
-                {PRICING.starter.features.map((f) => (
-                  <li key={f} className="flex gap-2.5">
-                    <span className="font-bold text-teal-dark">✓</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-8">
-                <PurchaseConsentGate href={LITTLY_URL_STARTER} label="구독 시작하기" variant="outline" />
-              </div>
-            </div>
-          )}
         </div>
       </section>
 

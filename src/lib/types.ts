@@ -1,3 +1,6 @@
+// 현재는 SCAN(9,900원) 단일 상품만 판매 중. LOCK-ON/FULL RADAR는 실제 판매 시작 시 추가.
+export type Product = 'scan'
+
 export type FounderStatus = '예비창업자' | '개인사업자' | '법인사업자' | '소상공인'
 
 export type RevenueBand = '없음' | '5천만미만' | '1억미만' | '3억미만' | '3억이상'

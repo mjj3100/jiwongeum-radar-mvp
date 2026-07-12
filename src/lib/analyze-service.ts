@@ -4,20 +4,30 @@ import { ruleBasedFilter } from '@/lib/grants/match'
 import { analyzeGrants } from '@/lib/anthropic/analyze'
 import type { AnalyzeResult, GrantListing } from '@/lib/types'
 
-export type AnalyzeError = 'no_entitlement' | 'no_business_profile' | 'analysis_failed'
+export type AnalyzeError =
+  | 'no_entitlement'
+  | 'no_business_profile'
+  | 'analysis_failed'
+  | 'analysis_limit_reached'
 
 const ANALYZE_ERROR_MESSAGES: Record<AnalyzeError, string> = {
   no_entitlement: '이용권이 확인되지 않습니다. 결제 후 주문번호로 가입해주세요.',
   no_business_profile: '사업 정보를 먼저 입력해주세요.',
   analysis_failed: '분석 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.',
+  analysis_limit_reached:
+    '이 진단권으로 가능한 재진단 3회를 모두 사용했어요. 더 정밀한 진단이 필요하시면 출시 예정인 LOCK-ON(19,900원)을 기다려주세요.',
 }
 
 export function analyzeErrorMessage(error: AnalyzeError): string {
   return ANALYZE_ERROR_MESSAGES[error]
 }
 
+// SCAN은 첫 진단 포함 총 3회까지만 재분석 가능하다 — 정보 수정을 통해 완전히 다른 사업
+// 아이템을 무제한 재분석받아 결제액을 초과하는 Claude API 비용이 발생하는 걸 막는다.
+const MAX_ANALYSIS_COUNT = 3
+
 /**
- * bundle 또는 미만료 starter 이용권을 가진 사용자에 대해 매칭+진단을 생성하고
+ * scan 이용권을 가진 사용자에 대해 매칭+진단을 생성하고
  * match_results / diagnosis_reports에 최신 결과로 교체 저장한다.
  * /api/analyze 라우트와 /result의 폼 제출 서버 액션이 공통으로 사용한다.
  */
@@ -26,18 +36,14 @@ export async function runAnalysisForUser(
 ): Promise<{ ok: true; result: AnalyzeResult } | { ok: false; error: AnalyzeError }> {
   const admin = createAdminClient()
 
-  const { data: entitlements } = await admin
+  const { data: entitlement } = await admin
     .from('entitlements')
-    .select('product, expires_at')
+    .select('product')
     .eq('user_id', userId)
-    .in('product', ['bundle', 'starter'])
+    .eq('product', 'scan')
+    .maybeSingle()
 
-  const hasBundle = entitlements?.some((e) => e.product === 'bundle')
-  const hasActiveStarter = entitlements?.some(
-    (e) => e.product === 'starter' && e.expires_at && new Date(e.expires_at) > new Date()
-  )
-
-  if (!hasBundle && !hasActiveStarter) {
+  if (!entitlement) {
     return { ok: false, error: 'no_entitlement' }
   }
 
@@ -49,6 +55,10 @@ export async function runAnalysisForUser(
 
   if (!profile) {
     return { ok: false, error: 'no_business_profile' }
+  }
+
+  if (profile.analysis_count >= MAX_ANALYSIS_COUNT) {
+    return { ok: false, error: 'analysis_limit_reached' }
   }
 
   // source='manual'은 K-Startup/기업마당 API 키 발급 전 임시 검증용 시드 데이터였다.
@@ -115,6 +125,11 @@ export async function runAnalysisForUser(
     })
     if (diagnosisError) console.error('[runAnalysisForUser] diagnosis_reports insert 실패:', diagnosisError)
   }
+
+  await admin
+    .from('business_profiles')
+    .update({ analysis_count: profile.analysis_count + 1 })
+    .eq('user_id', userId)
 
   return { ok: true, result }
 }

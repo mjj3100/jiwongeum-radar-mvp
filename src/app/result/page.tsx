@@ -34,21 +34,17 @@ export default async function ResultPage({
   const isAdmin = isAdminEmail(user.email)
   const admin = createAdminClient()
 
-  const { data: entitlements } = await admin
+  const { data: entitlement } = await admin
     .from('entitlements')
-    .select('product, expires_at')
+    .select('product')
     .eq('user_id', user.id)
-    .in('product', ['bundle', 'starter'])
-
-  const hasBundle = entitlements?.some((e) => e.product === 'bundle')
-  const hasActiveStarter = entitlements?.some(
-    (e) => e.product === 'starter' && e.expires_at && new Date(e.expires_at) > new Date()
-  )
+    .eq('product', 'scan')
+    .maybeSingle()
 
   // 이용권이 없는 로그인 계정은 전부 /pending으로 보낸다 — 최초 승인 대기 중이든,
   // 환불로 이용권이 회수된 뒤 재구매해 새 주문번호를 입력해야 하는 경우든 동일하게
   // 여기서 주문번호를 (재)입력해 재클레임을 시도할 수 있다.
-  if (!hasBundle && !hasActiveStarter) {
+  if (!entitlement) {
     redirect('/pending')
   }
 
@@ -80,7 +76,7 @@ export default async function ResultPage({
       <ResultsView
         matches={matches ?? []}
         diagnosis={diagnoses?.[0] ?? null}
-        canRerun={Boolean(hasActiveStarter)}
+        analysisCount={businessProfile.analysis_count}
         businessProfile={businessProfile as BusinessProfileInput & { updated_at: string }}
       />
     </AppShell>

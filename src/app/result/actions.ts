@@ -60,20 +60,3 @@ export async function submitBusinessProfile(
   revalidatePath('/result')
   redirect('/result')
 }
-
-export async function rerunAnalysis(): Promise<{ error: string } | undefined> {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) return { error: '로그인이 필요합니다.' }
-
-  const outcome = await runAnalysisForUser(user.id)
-  if (!outcome.ok) {
-    return { error: analyzeErrorMessage(outcome.error) }
-  }
-
-  revalidatePath('/result')
-  revalidatePath('/dashboard')
-}

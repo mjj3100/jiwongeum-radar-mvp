@@ -26,7 +26,7 @@ export async function createOrder(
   if (!isValidOrderNo(orderNoRaw)) {
     return { error: '주문번호는 숫자 16자리입니다.', success: false }
   }
-  if (product !== 'bundle' && product !== 'starter') {
+  if (product !== 'scan') {
     return { error: '상품 종류를 선택해주세요.', success: false }
   }
 
