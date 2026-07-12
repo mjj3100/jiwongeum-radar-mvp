@@ -83,6 +83,9 @@ export async function runAnalysisForUser(
         fit_reason: m.fit_reason,
         caution_note: m.caution_note,
         prep_priority: m.prep_priority,
+        eligibility_checks: m.eligibility_checks,
+        quote_excerpt: m.quote_excerpt,
+        required_documents: m.required_documents,
       }))
     )
     // insert 실패를 조용히 넘기면 화면엔 "매칭 후보 0건"으로만 보여 원인을 알 수 없다.

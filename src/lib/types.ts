@@ -46,6 +46,14 @@ export interface GrantListing {
 
 export type Verdict = '추천' | '조건부' | '확인 필요' | '비추천'
 
+export type EligibilityStatus = '충족' | '주의' | '미충족'
+
+export interface EligibilityCheck {
+  status: EligibilityStatus
+  label: string
+  detail: string
+}
+
 export interface MatchResult {
   grant_listing_id: string
   title: string
@@ -53,6 +61,9 @@ export interface MatchResult {
   fit_reason: string
   caution_note: string | null
   prep_priority: number
+  eligibility_checks: EligibilityCheck[]
+  quote_excerpt: string | null
+  required_documents: string[]
 }
 
 export interface RiskSentence {

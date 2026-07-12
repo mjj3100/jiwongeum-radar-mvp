@@ -5,6 +5,7 @@ import { AppShell } from '@/components/AppShell'
 import { ResultsView } from '@/app/result/ResultsView'
 import { LITTLY_URL_STARTER } from '@/lib/constants'
 import { isAdminEmail } from '@/lib/admin-auth'
+import type { BusinessProfileInput } from '@/lib/types'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -58,7 +59,7 @@ export default async function DashboardPage() {
 
   const { data: businessProfile } = await admin
     .from('business_profiles')
-    .select('user_id')
+    .select('*')
     .eq('user_id', user.id)
     .maybeSingle()
 
@@ -78,7 +79,7 @@ export default async function DashboardPage() {
   const [{ data: matches }, { data: diagnoses }] = await Promise.all([
     admin
       .from('match_results')
-      .select('*, grant_listings(title, original_url, support_content, support_scale, apply_end)')
+      .select('*, grant_listings(title, original_url, support_content, support_scale, apply_end, agency)')
       .eq('user_id', user.id)
       .order('prep_priority', { ascending: true }),
     admin.from('diagnosis_reports').select('*').eq('user_id', user.id).limit(1),
@@ -89,7 +90,12 @@ export default async function DashboardPage() {
       <div className="mx-auto mb-8 max-w-2xl rounded-xl border border-teal-dark/20 bg-teal-tint/60 px-5 py-4 text-sm font-semibold text-teal-dark">
         Starter 구독 만료일: {new Date(starter!.expires_at!).toLocaleDateString('ko-KR')}
       </div>
-      <ResultsView matches={matches ?? []} diagnosis={diagnoses?.[0] ?? null} canRerun />
+      <ResultsView
+        matches={matches ?? []}
+        diagnosis={diagnoses?.[0] ?? null}
+        canRerun
+        businessProfile={businessProfile as BusinessProfileInput & { updated_at: string }}
+      />
     </AppShell>
   )
 }

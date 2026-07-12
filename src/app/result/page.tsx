@@ -69,7 +69,7 @@ export default async function ResultPage({
   const [{ data: matches }, { data: diagnoses }] = await Promise.all([
     admin
       .from('match_results')
-      .select('*, grant_listings(title, original_url, support_content, support_scale, apply_end)')
+      .select('*, grant_listings(title, original_url, support_content, support_scale, apply_end, agency)')
       .eq('user_id', user.id)
       .order('prep_priority', { ascending: true }),
     admin.from('diagnosis_reports').select('*').eq('user_id', user.id).limit(1),
@@ -81,6 +81,7 @@ export default async function ResultPage({
         matches={matches ?? []}
         diagnosis={diagnoses?.[0] ?? null}
         canRerun={Boolean(hasActiveStarter)}
+        businessProfile={businessProfile as BusinessProfileInput & { updated_at: string }}
       />
     </AppShell>
   )

@@ -8,12 +8,21 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 const MODEL = 'claude-sonnet-5'
 
+const eligibilityCheckSchema = z.object({
+  status: z.enum(['충족', '주의', '미충족']),
+  label: z.string(),
+  detail: z.string(),
+})
+
 const matchSchema = z.object({
   grant_listing_id: z.string(),
   verdict: z.enum(['추천', '조건부', '확인 필요', '비추천']),
   fit_reason: z.string(),
   caution_note: z.string().nullable(),
   prep_priority: z.number().int(),
+  eligibility_checks: z.array(eligibilityCheckSchema).max(3),
+  quote_excerpt: z.string().nullable(),
+  required_documents: z.array(z.string()).max(6),
 })
 
 const axisReasonsSchema = z.object({
@@ -73,8 +82,8 @@ function buildUserPrompt(profile: BusinessProfileInput, candidates: GrantListing
 [공고 ${i + 1}] id=${c.id}
 제목: ${truncate(c.title, 120)}
 기관: ${c.agency ?? '미상'}
-신청대상: ${truncate(c.target_desc, 300)}
-제외대상: ${truncate(c.exclude_desc, 150, '없음')}
+신청대상: ${truncate(c.target_desc, 400)}
+제외대상: ${truncate(c.exclude_desc, 220, '없음')}
 지원내용: ${truncate(c.support_content, 300)}
 지원규모: ${truncate(c.support_scale, 150)}
 `.trim()
@@ -105,9 +114,18 @@ ${FEW_SHOT_EXAMPLE}
 ${candidateBlock}
 
 작업:
-1. 위 공고 후보 중 적합도 순으로 최대 5개를 골라 각각 판정(추천/조건부/확인 필요/비추천)과 이유(fit_reason),
-   주의조건(caution_note, 없으면 null), 준비우선순위(prep_priority, 1이 가장 급함)를 매겨라.
-2. 가장 적합한 1개 공고(1순위)에 대해 미니 4축(관련성/구체성/차별성/실현가능성, 각 0~25점) 예비진단을 하라.
+1. 위 공고 후보 중 적합도 순으로 최대 5개를 골라 각각 판정(추천/조건부/확인 필요/비추천)과 이유(fit_reason, 1~2문장·100자 이내),
+   주의조건(caution_note, 없으면 null, 100자 이내), 준비우선순위(prep_priority, 1이 가장 급함)를 매겨라.
+2. 각 매치마다 신청자격 판정 조건을 1~3개(eligibility_checks)로 제시하라: 상태(충족/주의/미충족),
+   조건 요약(label, 20자 이내), 상세 설명(detail, 1문장·80자 이내). 반드시 위 신청대상/제외대상 텍스트에
+   근거해야 하며, 원문에 없는 조건을 지어내지 마라.
+3. quote_excerpt에는 판정 근거가 되는 문장을 위 신청대상/제외대상/지원내용 텍스트에서 정확히 그대로
+   (축약·의역 금지) 복사해 넣어라. 정확히 인용할 문장이 없으면 반드시 null로 하라 — 원문에 없는
+   문장을 지어내면 안 된다.
+4. required_documents에는 이런 유형의 정부 지원사업 공고에서 통상적으로 요구되는 서류 3~6개
+   (사업계획서, 신분증 사본, 사업자등록 사실증명원 등)를 제시하라. 원문에 서류 목록이 없다면
+   일반적으로 요구되는 서류의 예시임을 감안해 작성하라. 비추천 판정 매치는 빈 배열로 두어도 된다.
+5. 가장 적합한 1개 공고(1순위)에 대해 미니 4축(관련성/구체성/차별성/실현가능성, 각 0~25점) 예비진단을 하라.
    각 축마다 "왜 이 점수인지"를 1문장으로 설명하는 사유(axis_reasons)를 반드시 함께 작성하라 —
    점수만 보여주고 이유를 안 주면 사용자가 무엇을 보완해야 할지 알 수 없다.
    위험 문장이 있다면 사업 아이템 설명에서 지적하라(risk_sentences). 요약(summary)도 작성하라.
@@ -115,7 +133,7 @@ ${candidateBlock}
 
 다음 JSON 스키마로만 응답하라 (다른 텍스트 없이 JSON만):
 {
-  "matches": [{"grant_listing_id": string, "verdict": string, "fit_reason": string, "caution_note": string|null, "prep_priority": number}],
+  "matches": [{"grant_listing_id": string, "verdict": string, "fit_reason": string, "caution_note": string|null, "prep_priority": number, "eligibility_checks": [{"status": "충족"|"주의"|"미충족", "label": string, "detail": string}], "quote_excerpt": string|null, "required_documents": string[]}],
   "diagnosis": {"relevance_score": number, "concreteness_score": number, "differentiation_score": number, "feasibility_score": number, "axis_reasons": {"relevance": string, "concreteness": string, "differentiation": string, "feasibility": string}, "risk_sentences": [{"quote": string, "reason": string, "suggestion": string}], "summary": string} | null
 }
 `.trim()
@@ -128,13 +146,35 @@ function extractJson(text: string): unknown {
   return JSON.parse(text.slice(start, end + 1))
 }
 
+// 공고 원문이 길 때 응답이 max_tokens에서 잘려 JSON 파싱이 깨지는 사고가 있었다(자격판정/
+// 원문인용/서류체크리스트 추가로 응답이 더 커짐). 잘렸을 때 파싱 실패로만 표면화되면 원인
+// 파악이 느리므로 stop_reason을 먼저 확인해 명확한 에러로 남긴다.
+function verifyQuote(quote: string | null, listing: GrantListing | undefined): string | null {
+  if (!quote || !listing) return null
+  const haystack = [listing.target_desc, listing.exclude_desc, listing.support_content, listing.support_scale]
+    .filter(Boolean)
+    .join(' ')
+    .replace(/\s+/g, '')
+  const needle = quote.replace(/\s+/g, '')
+  if (needle.length < 5 || !haystack.includes(needle)) {
+    console.warn(`[analyzeGrants] quote_excerpt가 원문에서 확인되지 않아 제거함 (grant=${listing.id})`)
+    return null
+  }
+  return quote
+}
+
 async function callClaude(profile: BusinessProfileInput, candidates: GrantListing[]) {
   const message = await client.messages.create({
     model: MODEL,
-    max_tokens: 8192,
+    max_tokens: 16384,
     system: GUARDRAIL_SYSTEM_PROMPT,
     messages: [{ role: 'user', content: buildUserPrompt(profile, candidates) }],
   })
+
+  if (message.stop_reason === 'max_tokens') {
+    console.error('[analyzeGrants] Claude 응답이 max_tokens에서 잘림 (stop_reason=max_tokens)')
+    throw new Error('Claude 응답이 최대 길이에서 잘렸습니다.')
+  }
 
   const textBlock = message.content.find((b) => b.type === 'text')
   if (!textBlock || textBlock.type !== 'text') throw new Error('Claude 응답에 텍스트가 없습니다.')
@@ -157,10 +197,17 @@ export async function analyzeGrants(
   let parsed = await callClaude(profile, candidates)
 
   const flatText = [
-    ...parsed.matches.flatMap((m) => [m.fit_reason, m.caution_note ?? '']),
+    ...parsed.matches.flatMap((m) => [
+      m.fit_reason,
+      m.caution_note ?? '',
+      ...m.eligibility_checks.flatMap((e) => [e.label, e.detail]),
+      ...m.required_documents,
+    ]),
     parsed.diagnosis?.summary ?? '',
     ...(parsed.diagnosis ? Object.values(parsed.diagnosis.axis_reasons) : []),
   ].join('\n')
+  // quote_excerpt는 공고 원문 그 자체이므로 flatText(재생성 트리거)에 포함하지 않는다 —
+  // 원문에 우연히 밴 패턴과 유사한 문구가 있어도 전체 응답을 재생성할 이유가 없다.
 
   if (containsBannedPhrase(flatText)) {
     parsed = await callClaude(profile, candidates)
@@ -170,14 +217,25 @@ export async function analyzeGrants(
     containsBannedPhrase(s) ? '표현을 확인 중입니다. 준비도 점검 결과를 참고해주세요.' : s
 
   return {
-    matches: parsed.matches.map((m) => ({
-      grant_listing_id: m.grant_listing_id,
-      title: candidates.find((c) => c.id === m.grant_listing_id)?.title ?? '',
-      verdict: m.verdict,
-      fit_reason: sanitize(m.fit_reason),
-      caution_note: m.caution_note ? sanitize(m.caution_note) : null,
-      prep_priority: m.prep_priority,
-    })),
+    matches: parsed.matches.map((m) => {
+      const listing = candidates.find((c) => c.id === m.grant_listing_id)
+      return {
+        grant_listing_id: m.grant_listing_id,
+        title: listing?.title ?? '',
+        verdict: m.verdict,
+        fit_reason: sanitize(m.fit_reason),
+        caution_note: m.caution_note ? sanitize(m.caution_note) : null,
+        prep_priority: m.prep_priority,
+        eligibility_checks: m.eligibility_checks.map((e) => ({
+          status: e.status,
+          label: sanitize(e.label),
+          detail: sanitize(e.detail),
+        })),
+        // 원문 그대로인지 검증 후 통과한 것만 노출 — Claude가 지어낸 인용문을 걸러낸다.
+        quote_excerpt: verifyQuote(m.quote_excerpt, listing),
+        required_documents: m.required_documents.map(sanitize),
+      }
+    }),
     diagnosis: parsed.diagnosis
       ? {
           relevance_score: parsed.diagnosis.relevance_score,

@@ -12,6 +12,11 @@
   --teal-tint: #e6faf5;
   --warm-tint: #fdf6e3;
   --warm-border: #d4af37;
+  --gold: #e5b04c;
+  --gold-dim: #b8905a;
+  --gold-ink: #6b5a33;
+  --teal-deep: #0f5e63;
+  --report-danger: #c4552f;
 }
 
 @theme inline {
@@ -27,6 +32,11 @@
   --color-teal-tint: var(--teal-tint);
   --color-warm-tint: var(--warm-tint);
   --color-warm-border: var(--warm-border);
+  --color-gold: var(--gold);
+  --color-gold-dim: var(--gold-dim);
+  --color-gold-ink: var(--gold-ink);
+  --color-teal-deep: var(--teal-deep);
+  --color-report-danger: var(--report-danger);
 }
 
 body {
