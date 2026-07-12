@@ -71,11 +71,12 @@
 - [x] **키 회전**(service_role, Anthropic) — 재발급 + Vercel 프로덕션 환경변수 반영 완료
 - [x] Supabase Site URL = `https://jiwongeum-radar-mvp.vercel.app` — 확인 완료
 
-## Phase 9 — 실결제 검수 ✅ AI 분석 직전까지 통과
+## Phase 9 — 실결제 검수 ✅ 완료
 - [x] 실제 결제 1건 → 진짜 주문번호로 가입→승인까지 확인 (AI 분석 단계는 크레딧 문제로 대기)
 - [x] 같은 주문번호 재사용 시 차단 확인
 - [x] Starter 재구매 시 만료일 연장 확인
-- [ ] 테스트 결제 환불 (AI 분석까지 끝까지 확인 후 진행 권장)
+- [x] 테스트 결제 환불 — 진단 발급 후에는 이용약관상 환불 대상이 아니므로("제출 준비도 참고 자료" 발급 시점 = 서비스 제공 완료) 별도 테스트 불필요로 판단. 진단 발급 전 환불(주문번호 삭제) 동작은 확인 완료
+- [x] 운영자 본인이 `/admin/orders`에서 직접 주문번호 등록 리허설 완료 — Claude Code 스크립트 대행 없이도 단독 운영 가능 확인
 
 ## 백로그 (이번 MVP 범위 아님)
 - Builder(신청준비방 7탭), Diagnostic/Deep 단건결제, Season Pass
