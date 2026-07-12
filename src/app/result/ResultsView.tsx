@@ -82,7 +82,7 @@ export function ResultsView({
     businessProfile.age_group ? ` (${businessProfile.age_group})` : ''
   }`
   const issueDate = diagnosis?.created_at ?? businessProfile.updated_at
-  const issueDateLabel = new Date(issueDate).toLocaleDateString('ko-KR')
+  const issueDateLabel = formatDate(issueDate)
   const reportNo = diagnosis ? buildReportNo(diagnosis) : null
   const headline = buildHeadline(matches)
 
@@ -384,14 +384,25 @@ function Score({ label, value, reason }: { label: string; value: number; reason?
   )
 }
 
+// Intl.toLocaleString('ko-KR')는 서버(Node)와 브라우저의 ICU 데이터 차이로 오전/오후 표기가
+// 서로 다르게 나와("오후" vs "PM") 하이드레이션 불일치를 일으킨 적이 있다(이 컴포넌트가
+// 'use client'라 서버 렌더와 클라이언트 hydration에서 같은 포맷 코드가 각각 실행됨).
+// 로케일 API에 의존하지 않고 직접 조립해 두 환경에서 항상 동일한 문자열이 나오게 한다.
+function pad2(n: number): string {
+  return String(n).padStart(2, '0')
+}
+
+function formatDate(iso: string): string {
+  const d = new Date(iso)
+  return `${d.getFullYear()}. ${pad2(d.getMonth() + 1)}. ${pad2(d.getDate())}.`
+}
+
 function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+  const d = new Date(iso)
+  const hour24 = d.getHours()
+  const period = hour24 < 12 ? '오전' : '오후'
+  const hour12 = hour24 % 12 === 0 ? 12 : hour24 % 12
+  return `${formatDate(iso)} ${period} ${pad2(hour12)}:${pad2(d.getMinutes())}`
 }
 
 function DdayBadge({ applyEnd }: { applyEnd: string | null }) {
